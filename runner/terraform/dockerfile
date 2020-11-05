@@ -1,12 +1,12 @@
 FROM hashicorp/terraform:light
 WORKDIR /
 
-RUN apk update && \
-    apk add bash jq py-pip && \
-    apk add --virtual=build gcc libffi-dev musl-dev openssl-dev python-dev make && \
-    pip install --upgrade pip && \
-    pip install azure-cli && \
-    apk del --purge build
+RUN apk update 
+RUN apk add bash jq py-pip 
+RUN apk add --virtual=build gcc libffi-dev musl-dev openssl-dev python-dev make 
+RUN pip install --upgrade pip 
+RUN pip install azure-cli 
+RUN apk del --purge build
 
 COPY tfrunner.sh /terraform/tfrunner
 RUN chmod +x /terraform/tfrunner
