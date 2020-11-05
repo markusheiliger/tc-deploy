@@ -31,5 +31,5 @@ jobs:
           context: ./runner/terraform
           file: ./runner/terraform/dockerfile
           platforms: linux/amd64
-          tags: "${{ secrets.DOCKER_USR }}/tcrterraform:latest"
+          tags: markusheiliger/tcrterraform:latest
           push: true
