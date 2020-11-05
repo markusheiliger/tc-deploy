@@ -3,10 +3,10 @@ WORKDIR /
 
 RUN apk update 
 RUN apk add bash jq py-pip 
-RUN apk add --virtual build gcc libffi-dev musl-dev openssl-dev python-dev make 
+RUN apk add --virtual azbuild gcc libffi-dev musl-dev openssl-dev python-dev make 
 RUN pip install --upgrade pip 
 RUN pip install azure-cli 
-RUN apk del --purge build
+RUN apk del --purge azbuild
 
 COPY tfrunner.sh /terraform/tfrunner
 RUN chmod +x /terraform/tfrunner
