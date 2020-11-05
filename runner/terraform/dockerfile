@@ -13,3 +13,4 @@ RUN chmod +x /terraform/tfrunner
 ENV PATH="/terraform:${PATH}"
 
 ENTRYPOINT [ "tfrunner" ]
+
