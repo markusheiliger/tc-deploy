@@ -8,9 +8,9 @@ RUN apk update && \
     pip install azure-cli && \
     apk del --purge azbuild
 
-COPY tfrunner.sh /terraform/tfrunner
-RUN chmod +x /terraform/tfrunner
+COPY runner.sh /terraform/runner
+RUN chmod +x /terraform/runner
 ENV PATH="/terraform:${PATH}"
 
-ENTRYPOINT [ "tfrunner" ]
+ENTRYPOINT [ "runner" ]
 

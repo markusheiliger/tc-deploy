@@ -25,19 +25,9 @@ while true; do
     } || sleep 5    
 done
 
-trace "Wait for Azure deployment ..."
-az group deployment wait --resource-group $EnvironmentResourceGroupName --name $EnvironmentDeploymentName --created
-
 trace "Initializing Terraform ..."
 terraform init
 
 trace "Applying Terraform ..."
 terraform apply -auto-approve -var "EnvironmentResourceGroupName=$EnvironmentResourceGroupName"
 
-if [ -z "$ContainerGroupId" ]; then
-    trace "Waiting for termination ..."
-    tail -f /dev/null
-else
-    trace "Deleting container groups ..."
-    az container delete --yes --ids $ContainerGroupId
-fi
