@@ -1,0 +1,278 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environment": {
+            "type": "string",
+            "defaultValue": "[guid(deployment().name)]"
+        },
+        "environmentLocation": {
+            "type": "string",
+            "defaultValue": "[deployment().location]"
+        },
+        "templateRunner": {
+            "type": "string"
+        },
+        "templateUri": {
+            "type": "string"
+        },
+        "deploymentIdentity": {
+            "type": "string",
+            "defaultValue": ""
+        }
+    },
+    "variables": {
+
+        "ResourceGroupPrefix": "TeamCloud",
+        "RunnerResourceGroup": "[concat(variables('ResourceGroupPrefix'), '-Runner_', toLower(replace(parameters('environmentLocation'), ' ', '')))]",
+        "TargetResourceGroup": "[concat(variables('ResourceGroupPrefix'), '-', parameters('environment'))]"
+    },
+    "resources": [
+        {
+            "name": "[variables('RunnerResourceGroup')]",
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2020-06-01",
+            "location": "[parameters('environmentLocation')]",
+            "tags": {},
+            "properties": {}
+        },
+        {
+            "name": "[variables('TargetResourceGroup')]",
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2020-06-01",
+            "location": "[parameters('environmentLocation')]",
+            "tags": {},
+            "properties": {}
+        },
+
+        {
+            "name": "[concat(deployment().name, '-init')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-06-01",
+            "resourceGroup": "[variables('RunnerResourceGroup')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/resourceGroups', variables('RunnerResourceGroup'))]"
+            ],
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                    "environment": {
+                        "value": "[parameters('environment')]"
+                    },
+                    "environmentLocation": {
+                        "value": "[parameters('environmentLocation')]"
+                    },
+                    "deploymentIdentity": {
+                        "value": "[parameters('deploymentIdentity')]"
+                    }
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "environment": {
+                            "type": "string"
+                        },
+                        "environmentLocation": {
+                            "type": "string"
+                        },
+                        "deploymentIdentity": {
+                            "type": "string"
+                        }
+                    },
+                    "variables": {
+                        "deploymentIdentityName": "[guid(parameters('environment'))]"
+                    },
+                    "resources": [
+
+                        {
+                            "condition": "[empty(parameters('deploymentIdentity'))]",
+                            "name": "[variables('deploymentIdentityName')]",
+                            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+                            "apiVersion": "2018-11-30",
+                            "tags": {},
+                            "location": "[parameters('environmentLocation')]"
+                        }
+
+                    ],
+                    "outputs": {
+                        "deploymentIdentity": {
+                            "type": "string",
+                            "value": "[if(empty(parameters('deploymentIdentity')), resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('deploymentIdentityName')), parameters('deploymentIdentity'))]"
+                        },
+                        "deploymentPrincipal": {
+                            "type": "string",
+                            "value": "[if(empty(parameters('deploymentIdentity')), reference(variables('deploymentIdentityName')).principalId, reference(parameters('deploymentIdentity'), '2018-11-30').principalId)]"
+                        }
+                    }
+                }
+            }
+        },
+
+        {
+            "name": "[concat(deployment().name, '-prep')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-06-01",
+            "resourceGroup": "[variables('TargetResourceGroup')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/resourceGroups', variables('TargetResourceGroup'))]",
+                "[concat(deployment().name, '-init')]"
+            ],
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                    "deploymentIdentity": {
+                        "value": "[reference(concat(deployment().name, '-init')).outputs.deploymentIdentity.value]"
+                    },
+                    "deploymentPrincipal": {
+                        "value": "[reference(concat(deployment().name, '-init')).outputs.deploymentPrincipal.value]"
+                    }
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "deploymentIdentity": {
+                            "type": "string"
+                        },
+                        "deploymentPrincipal": {
+                            "type": "string"
+                        }
+                    },
+                    "variables": {
+                        "RoleDefinitionContributor": "[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]"
+                    },
+                    "resources": [
+                        {
+                            "name": "[guid(parameters('deploymentIdentity'))]",
+                            "type": "Microsoft.Authorization/roleAssignments",
+                            "apiVersion": "2018-09-01-preview",
+                            "properties": {
+                                "roleDefinitionId": "[variables('RoleDefinitionContributor')]",
+                                "principalId": "[parameters('deploymentPrincipal')]",
+                                "scope": "[resourceGroup().id]",
+                                "principalType": "ServicePrincipal"
+                            }
+                        }
+                    ],
+                    "outputs": {
+                    }
+                }
+            }
+        },
+
+        {
+            "name": "[concat(deployment().name, '-exec')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-06-01",
+            "resourceGroup": "[variables('RunnerResourceGroup')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/resourceGroups', variables('RunnerResourceGroup'))]",
+                "[concat(deployment().name, '-prep')]"
+            ],
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                    "environment": {
+                        "value": "[parameters('environment')]"
+                    },
+                    "templateRunner": {
+                        "value": "[parameters('templateRunner')]"
+                    },
+                    "templateUri": {
+                        "value": "[parameters('templateUri')]"
+                    },                    
+                    "deploymentIdentity": {
+                        "value": "[reference(concat(deployment().name, '-init')).outputs.deploymentIdentity.value]"
+                    }
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "environment": {
+                            "type": "string"
+                        },
+                        "templateRunner": {
+                            "type": "string"
+                        },
+                        "templateUri": {
+                            "type": "string"
+                        },
+                        "deploymentIdentity": {
+                            "type": "string"
+                        }
+                    },
+                    "variables": {
+                        "containerGroupName": "[guid(parameters('environment'))]"
+                    },
+                    "resources": [
+
+                        {
+                            "name": "[variables('containerGroupName')]",
+                            "type": "Microsoft.ContainerInstance/containerGroups",
+                            "apiVersion": "2019-12-01",
+                            "location": "[resourceGroup().location]",
+                            "identity": {
+                                "type": "UserAssigned",
+                                "userAssignedIdentities": {
+                                    "[parameters('deploymentIdentity')]": {}
+                                }
+                            },
+                            "properties": {
+                                "containers": [
+                                    {
+                                        "name": "runner",
+                                        "properties": {
+                                            "command": [ ],
+                                            "image": "[parameters('templateRunner')]",
+                                            "resources": {
+                                                "requests": {
+                                                    "cpu": 1,
+                                                    "memoryInGB": 1
+                                                }
+                                            },
+                                            "environmentVariables": [
+                                                {
+                                                    "name": "EnvironmentTemplateUri",
+                                                    "value": "[parameters('templateUri')]"
+                                                },
+                                                {
+                                                    "name": "EnvironmentResourceGroupId",
+                                                    "value": "[resourceGroup().id]"
+                                                },
+                                                {
+                                                    "name": "EnvironmentResourceGroupName",
+                                                    "value": "[resourceGroup().name]"
+                                                },
+                                                {
+                                                    "name":"EnvironmentResourceGroupSubscription",
+                                                    "value": "[subscription().id]"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ],
+                                "osType": "Linux",
+                                "restartPolicy": "Never"
+                            }
+                        }
+                    ],
+                    "outputs": {
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+    }
+}

@@ -31,3 +31,4 @@ terraform init
 trace "Applying Terraform ..."
 terraform apply -auto-approve -var "EnvironmentResourceGroupName=$EnvironmentResourceGroupName"
 
+tail -f /dev/null
