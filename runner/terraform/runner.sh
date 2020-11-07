@@ -27,6 +27,9 @@ while true; do
     } || sleep 5    
 done
 
+trace "Selecting subscription"
+az account set --subscription $EnvironmentResourceGroupSubscription
+
 trace "Initializing Terraform"
 terraform init
 
