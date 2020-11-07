@@ -8,10 +8,10 @@ trace "Initializing downloads"
 mkdir /templates && cd /templates
 
 trace "Downloading template"
-wget $EnvironmentTemplateUri
+wget "$EnvironmentTemplateUri"
 
 trace "Downloading artifacts"
-for url in $*; do wget ${url}; done
+for url in $*; do wget "${url}"; done
 
 trace "Sanitizing downloads"
 for file in $(find -type f -name "*\?*"); do mv $file $(echo $file | cut -d? -f1); done

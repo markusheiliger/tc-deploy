@@ -162,7 +162,7 @@
                         }
                     ],
                     "outputs": {
-                        "output1": {
+                        "environmentId": {
                             "type": "string",
                             "value": "[resourceGroup().id]"
                         }
