@@ -162,6 +162,10 @@
                         }
                     ],
                     "outputs": {
+                        "output1": {
+                            "type": "string",
+                            "value": "[resourceGroup().id]"
+                        }
                     }
                 }
             }
@@ -185,6 +189,9 @@
                     "environment": {
                         "value": "[parameters('environment')]"
                     },
+                    "environmentId": {
+                        "value": "[reference(concat(deployment().name, '-prep')).outputs.environmentId.value]"
+                    },
                     "templateRunner": {
                         "value": "[parameters('templateRunner')]"
                     },
@@ -202,6 +209,9 @@
                         "environment": {
                             "type": "string"
                         },
+                        "environmentId": {
+                            "type": "string"
+                        },
                         "templateRunner": {
                             "type": "string"
                         },
@@ -213,6 +223,7 @@
                         }
                     },
                     "variables": {
+                        "environmentSegments": "[split(parameters('environmentId'), '/')]",
                         "containerGroupName": "[guid(parameters('environment'))]"
                     },
                     "resources": [
@@ -247,16 +258,16 @@
                                                     "value": "[parameters('templateUri')]"
                                                 },
                                                 {
-                                                    "name": "EnvironmentResourceGroupId",
-                                                    "value": "[resourceGroup().id]"
+                                                    "name": "EnvironmentId",
+                                                    "value": "[parameters('environmentId')]"
                                                 },
                                                 {
-                                                    "name": "EnvironmentResourceGroupName",
-                                                    "value": "[resourceGroup().name]"
+                                                    "name": "EnvironmentResourceGroup",
+                                                    "value": "[if(greaterOrEquals(length(variables('environmentSegments')),5), variables('environmentSegments')[4], '')]"
                                                 },
                                                 {
-                                                    "name":"EnvironmentResourceGroupSubscription",
-                                                    "value": "[subscription().id]"
+                                                    "name": "EnvironmentSubscription",
+                                                    "value": "[if(greaterOrEquals(length(variables('environmentSegments')),3), variables('environmentSegments')[2], '')]"
                                                 }
                                             ]
                                         }
