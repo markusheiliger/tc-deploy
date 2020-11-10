@@ -6,8 +6,9 @@ RUN apk update && \
 
 COPY templates /etc/nginx/sites-enabled/templates
 
-COPY runner.sh /runner
-RUN chmod +x /runner
+COPY runner.sh /teamcloud/runner
+RUN chmod +x /teamcloud/runner
+ENV PATH="/teamcloud:${PATH}"
 
 ENTRYPOINT [ "runner" ]
 

@@ -8,9 +8,9 @@ RUN apk update && \
     pip install azure-cli && \
     apk del --purge azbuild
 
-COPY runner.sh /terraform/runner
-RUN chmod +x /terraform/runner
-ENV PATH="/terraform:${PATH}"
+COPY runner.sh /teamcloud/runner
+RUN chmod +x /teamcloud/runner
+ENV PATH="/teamcloud:${PATH}"
 
 ENTRYPOINT [ "runner" ]
 

@@ -6,13 +6,13 @@
             "value": "[newGuid()]"
         },
         "environmentTemplatePath": {
-            "value": "/appservice-terraform/azuredeploy.tf"
+            "value": "/appservice-arm/azuredeploy.tf"
         },
         "environmentTemplateRepository": {
             "value": "https://git:pat@github.com/markusheiliger/tc-environments"
         },
         "deploymentRunner": {
-            "value": "markusheiliger/tcrterraform"
+            "value": "markusheiliger/tcrarm"
         },
         "deploymentIdentity": {
             "value": "/subscriptions/35b14d48-eaff-4137-a96b-3a33013f7b74/resourceGroups/TeamCloudHome/providers/Microsoft.ManagedIdentity/userAssignedIdentities/tcdeploymentidentity"
