@@ -4,17 +4,6 @@ trace() {
     echo ">>> $@ ..."
 }
 
-trace "Initializing downloads"
-mkdir /templates && cd /templates
-
-trace "Downloading template"
-wget "$EnvironmentTemplateUri"
-
-trace "Downloading artifacts"
-for url in $*; do wget "${url}"; done
-
-trace "Sanitizing downloads"
-for file in $(find -type f -name "*\?*"); do mv $file $(echo $file | cut -d? -f1); done
 
 trace "Connecting Azure"
 while true; do
@@ -30,10 +19,10 @@ done
 trace "Selecting subscription"
 az account set --subscription $EnvironmentResourceGroupSubscription
 
-trace "Initializing Terraform"
-terraform init
+trace "Initializing terraform"
+echo "$EnvironmentTemplate" |  sed 's/file:\/\///' | cd && terraform init
 
-trace "Applying Terraform"
+trace "Applying terraform"
 terraform apply -auto-approve -var "EnvironmentResourceGroupName=$EnvironmentResourceGroupName"
 
 tail -f /dev/null

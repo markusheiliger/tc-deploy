@@ -2,34 +2,38 @@
     "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "environment": {
+        "environmentName": {
+            "type": "string"
+        },
+        "environmentTemplatePath": {
+            "type": "string"
+        },
+        "environmentTemplateRepository": {
+            "type": "string"
+        },
+        "environmentTemplateRevision": {
             "type": "string",
-            "defaultValue": "[guid(deployment().name)]"
+            "defaultValue": ""
         },
         "environmentLocation": {
             "type": "string",
             "defaultValue": "[deployment().location]"
         },
-        "templateRunner": {
-            "type": "string"
-        },
-        "templateUri": {
+        "deploymentRunner": {
             "type": "string"
         },
         "deploymentIdentity": {
-            "type": "string",
-            "defaultValue": ""
+            "type": "string"
         }
     },
     "variables": {
-
         "ResourceGroupPrefix": "TeamCloud",
-        "RunnerResourceGroup": "[concat(variables('ResourceGroupPrefix'), '-Runner_', toLower(replace(parameters('environmentLocation'), ' ', '')))]",
-        "TargetResourceGroup": "[concat(variables('ResourceGroupPrefix'), '-', parameters('environment'))]"
+        "EnvironmentResourceGroup": "[concat(variables('ResourceGroupPrefix'), '-', parameters('environmentName'))]",
+        "DeploymentResourceGroup": "[concat(variables('EnvironmentResourceGroup'), '-', guid(deployment().name))]"
     },
     "resources": [
         {
-            "name": "[variables('RunnerResourceGroup')]",
+            "name": "[variables('EnvironmentResourceGroup')]",
             "type": "Microsoft.Resources/resourceGroups",
             "apiVersion": "2020-06-01",
             "location": "[parameters('environmentLocation')]",
@@ -37,21 +41,12 @@
             "properties": {}
         },
         {
-            "name": "[variables('TargetResourceGroup')]",
-            "type": "Microsoft.Resources/resourceGroups",
-            "apiVersion": "2020-06-01",
-            "location": "[parameters('environmentLocation')]",
-            "tags": {},
-            "properties": {}
-        },
-
-        {
-            "name": "[concat(deployment().name, '-init')]",
+            "name": "[concat(variables('EnvironmentResourceGroup'), '-Prepare')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-06-01",
-            "resourceGroup": "[variables('RunnerResourceGroup')]",
+            "resourceGroup": "[variables('EnvironmentResourceGroup')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/resourceGroups', variables('RunnerResourceGroup'))]"
+                "[resourceId('Microsoft.Resources/resourceGroups', variables('EnvironmentResourceGroup'))]"
             ],
             "properties": {
                 "expressionEvaluationOptions": {
@@ -59,12 +54,6 @@
                 },
                 "mode": "Incremental",
                 "parameters": {
-                    "environment": {
-                        "value": "[parameters('environment')]"
-                    },
-                    "environmentLocation": {
-                        "value": "[parameters('environmentLocation')]"
-                    },
                     "deploymentIdentity": {
                         "value": "[parameters('deploymentIdentity')]"
                     }
@@ -73,75 +62,7 @@
                     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
                     "contentVersion": "1.0.0.0",
                     "parameters": {
-                        "environment": {
-                            "type": "string"
-                        },
-                        "environmentLocation": {
-                            "type": "string"
-                        },
                         "deploymentIdentity": {
-                            "type": "string"
-                        }
-                    },
-                    "variables": {
-                        "deploymentIdentityName": "[guid(parameters('environment'))]"
-                    },
-                    "resources": [
-
-                        {
-                            "condition": "[empty(parameters('deploymentIdentity'))]",
-                            "name": "[variables('deploymentIdentityName')]",
-                            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-                            "apiVersion": "2018-11-30",
-                            "tags": {},
-                            "location": "[parameters('environmentLocation')]"
-                        }
-
-                    ],
-                    "outputs": {
-                        "deploymentIdentity": {
-                            "type": "string",
-                            "value": "[if(empty(parameters('deploymentIdentity')), resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('deploymentIdentityName')), parameters('deploymentIdentity'))]"
-                        },
-                        "deploymentPrincipal": {
-                            "type": "string",
-                            "value": "[if(empty(parameters('deploymentIdentity')), reference(variables('deploymentIdentityName')).principalId, reference(parameters('deploymentIdentity'), '2018-11-30').principalId)]"
-                        }
-                    }
-                }
-            }
-        },
-
-        {
-            "name": "[concat(deployment().name, '-prep')]",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-06-01",
-            "resourceGroup": "[variables('TargetResourceGroup')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Resources/resourceGroups', variables('TargetResourceGroup'))]",
-                "[concat(deployment().name, '-init')]"
-            ],
-            "properties": {
-                "expressionEvaluationOptions": {
-                    "scope": "inner"
-                },
-                "mode": "Incremental",
-                "parameters": {
-                    "deploymentIdentity": {
-                        "value": "[reference(concat(deployment().name, '-init')).outputs.deploymentIdentity.value]"
-                    },
-                    "deploymentPrincipal": {
-                        "value": "[reference(concat(deployment().name, '-init')).outputs.deploymentPrincipal.value]"
-                    }
-                },
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "parameters": {
-                        "deploymentIdentity": {
-                            "type": "string"
-                        },
-                        "deploymentPrincipal": {
                             "type": "string"
                         }
                     },
@@ -150,12 +71,12 @@
                     },
                     "resources": [
                         {
-                            "name": "[guid(parameters('deploymentIdentity'))]",
+                            "name": "[guid(resourceGroup().id)]",
                             "type": "Microsoft.Authorization/roleAssignments",
                             "apiVersion": "2018-09-01-preview",
                             "properties": {
                                 "roleDefinitionId": "[variables('RoleDefinitionContributor')]",
-                                "principalId": "[parameters('deploymentPrincipal')]",
+                                "principalId": "[reference(parameters('deploymentIdentity'), '2018-11-30').principalId]",
                                 "scope": "[resourceGroup().id]",
                                 "principalType": "ServicePrincipal"
                             }
@@ -170,15 +91,22 @@
                 }
             }
         },
-
         {
-            "name": "[concat(deployment().name, '-exec')]",
+            "name": "[variables('DeploymentResourceGroup')]",
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2020-06-01",
+            "location": "[parameters('environmentLocation')]",
+            "tags": {},
+            "properties": {}
+        },
+        {
+            "name": "[concat(variables('EnvironmentResourceGroup'), '-Deploy')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-06-01",
-            "resourceGroup": "[variables('RunnerResourceGroup')]",
+            "resourceGroup": "[variables('DeploymentResourceGroup')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/resourceGroups', variables('RunnerResourceGroup'))]",
-                "[concat(deployment().name, '-prep')]"
+                "[resourceId('Microsoft.Resources/resourceGroups', variables('EnvironmentResourceGroup'))]",
+                "[concat(variables('EnvironmentResourceGroup'), '-Prepare')]"
             ],
             "properties": {
                 "expressionEvaluationOptions": {
@@ -186,36 +114,43 @@
                 },
                 "mode": "Incremental",
                 "parameters": {
-                    "environment": {
-                        "value": "[parameters('environment')]"
-                    },
                     "environmentId": {
-                        "value": "[reference(concat(deployment().name, '-prep')).outputs.environmentId.value]"
+                        "value": "[reference(concat(variables('EnvironmentResourceGroup'), '-Prepare')).outputs.environmentId.value]"
                     },
-                    "templateRunner": {
-                        "value": "[parameters('templateRunner')]"
+                    "environmentTemplatePath": {
+                        "value": "[parameters('environmentTemplatePath')]"
                     },
-                    "templateUri": {
-                        "value": "[parameters('templateUri')]"
-                    },                    
+                    "environmentTemplateRepository": {
+                        "value": "[parameters('environmentTemplateRepository')]"
+                    },
+                    "environmentTemplateRevision": {
+                        "value": "[parameters('environmentTemplateRevision')]"
+                    },
+
+                    "deploymentRunner": {
+                        "value": "[parameters('deploymentRunner')]"
+                    },
                     "deploymentIdentity": {
-                        "value": "[reference(concat(deployment().name, '-init')).outputs.deploymentIdentity.value]"
+                        "value": "[parameters('deploymentIdentity')]"
                     }
                 },
                 "template": {
                     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
                     "contentVersion": "1.0.0.0",
                     "parameters": {
-                        "environment": {
-                            "type": "string"
-                        },
                         "environmentId": {
                             "type": "string"
                         },
-                        "templateRunner": {
+                        "environmentTemplatePath": {
                             "type": "string"
                         },
-                        "templateUri": {
+                        "environmentTemplateRepository": {
+                            "type": "string"
+                        },
+                        "environmentTemplateRevision": {
+                            "type": "string"
+                        },
+                        "deploymentRunner": {
                             "type": "string"
                         },
                         "deploymentIdentity": {
@@ -223,13 +158,12 @@
                         }
                     },
                     "variables": {
-                        "environmentSegments": "[split(parameters('environmentId'), '/')]",
-                        "containerGroupName": "[guid(parameters('environment'))]"
+                        "environmentSegments": "[split(parameters('environmentId'), '/')]"
                     },
                     "resources": [
 
                         {
-                            "name": "[variables('containerGroupName')]",
+                            "name": "[guid(parameters('environmentId'))]",
                             "type": "Microsoft.ContainerInstance/containerGroups",
                             "apiVersion": "2019-12-01",
                             "location": "[resourceGroup().location]",
@@ -244,8 +178,8 @@
                                     {
                                         "name": "runner",
                                         "properties": {
-                                            "command": [ ],
-                                            "image": "[parameters('templateRunner')]",
+                                            "command": [],
+                                            "image": "[parameters('deploymentRunner')]",
                                             "resources": {
                                                 "requests": {
                                                     "cpu": 1,
@@ -254,12 +188,12 @@
                                             },
                                             "environmentVariables": [
                                                 {
-                                                    "name": "EnvironmentTemplateUri",
-                                                    "value": "[parameters('templateUri')]"
-                                                },
-                                                {
                                                     "name": "EnvironmentId",
                                                     "value": "[parameters('environmentId')]"
+                                                },
+                                                {
+                                                    "name": "EnvironmentTemplate",
+                                                    "value": "[uri('file:///mnt/templates/root/', if (startsWith(parameters('environmentTemplatePath'), '/'), skip(parameters('environmentTemplatePath'), 1), parameters('environmentTemplatePath')))]"
                                                 },
                                                 {
                                                     "name": "EnvironmentResourceGroup",
@@ -269,21 +203,38 @@
                                                     "name": "EnvironmentSubscription",
                                                     "value": "[if(greaterOrEquals(length(variables('environmentSegments')),3), variables('environmentSegments')[2], '')]"
                                                 }
+                                            ],
+                                            "volumeMounts": [
+                                                {
+                                                    "name": "templates",
+                                                    "mountPath": "/mnt/templates",
+                                                    "readOnly": false
+                                                }
                                             ]
                                         }
                                     }
                                 ],
                                 "osType": "Linux",
-                                "restartPolicy": "Never"
+                                "restartPolicy": "Never",
+                                "volumes": [
+                                    {
+
+                                        "name": "templates",
+                                        "gitRepo": {
+                                            "directory": "root",
+                                            "repository": "[parameters('environmentTemplateRepository')]",
+                                            "revision": "[parameters('environmentTemplateRevision')]"
+                                        }
+                                    }
+                                ]
                             }
                         }
                     ],
                     "outputs": {
+
                     }
                 }
             }
         }
-    ],
-    "outputs": {
-    }
+    ]
 }
