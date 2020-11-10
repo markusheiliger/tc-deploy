@@ -25,6 +25,15 @@ jobs:
           username: ${{ secrets.DOCKER_USR }}
           password: ${{ secrets.DOCKER_PWD }}
           
+      - name: Build and push Docker image - arm
+        uses: docker/build-push-action@v2.1.0
+        with:
+          context: ./runner/arm
+          file: ./runner/arm/Dockerfile
+          platforms: linux/amd64
+          tags: markusheiliger/tcrarm:latest
+          push: true
+
       - name: Build and push Docker image - terraform
         uses: docker/build-push-action@v2.1.0
         with:

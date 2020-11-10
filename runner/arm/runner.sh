@@ -4,7 +4,6 @@ trace() {
     echo ">>> $@ ..."
 }
 
-
 trace "Connecting Azure"
 while true; do
     # managed identity isn't avaialble directly - retry
@@ -21,11 +20,5 @@ az account set --subscription $EnvironmentSubscription
 
 trace "Selecting template"
 echo "$(dirname $EnvironmentTemplate)" |  sed 's/file:\/\///' | cd && echo $PWD
-
-trace "Initializing terraform"
-terraform init
-
-trace "Applying terraform"
-terraform apply -auto-approve -var "EnvironmentResourceGroupName=$EnvironmentResourceGroup"
 
 tail -f /dev/null
