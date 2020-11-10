@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/azure-cli:latest
 WORKDIR /
 
 RUN apk update && \
-    apk add bash jq nginx
+    apk add openrc bash jq nginx
 
 COPY templates /etc/nginx/sites-enabled/templates
 
