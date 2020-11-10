@@ -20,7 +20,7 @@ trace "Selecting subscription"
 az account set --subscription $EnvironmentSubscription
 
 trace "Selecting template"
-echo "$(dirname $EnvironmentTemplate)" |  sed 's/file:\/\///' | cd && echo $PWD
+cd $(echo "$(dirname $EnvironmentTemplate)" | sed 's/^file:\/\///') && echo $PWD
 
 trace "Initializing terraform"
 terraform init
