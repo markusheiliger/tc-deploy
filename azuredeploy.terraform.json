@@ -9,7 +9,7 @@
             "value": "/appservice-terraform/azuredeploy.tf"
         },
         "environmentTemplateRepository": {
-            "value": "https://git:pat@github.com/markusheiliger/tc-environments"
+            "value": "https://github.com/markusheiliger/tc-environments"
         },
         "deploymentRunner": {
             "value": "markusheiliger/tcrterraform"

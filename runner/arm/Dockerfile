@@ -10,5 +10,5 @@ COPY runner.sh /teamcloud/runner
 RUN chmod +x /teamcloud/runner
 ENV PATH="/teamcloud:${PATH}"
 
-ENTRYPOINT [ "runner" ]
+ENTRYPOINT [ "service nginx restart && runner" ]
 

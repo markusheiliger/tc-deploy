@@ -6,10 +6,10 @@
             "value": "[newGuid()]"
         },
         "environmentTemplatePath": {
-            "value": "/appservice-arm/azuredeploy.tf"
+            "value": "/appservice-arm/azuredeploy.json"
         },
         "environmentTemplateRepository": {
-            "value": "https://git:pat@github.com/markusheiliger/tc-environments"
+            "value": "https://github.com/markusheiliger/tc-environments"
         },
         "deploymentRunner": {
             "value": "markusheiliger/tcrarm"
