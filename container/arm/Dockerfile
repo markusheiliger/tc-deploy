@@ -9,3 +9,4 @@ RUN apk update && \
     apk del --purge azbuild
 
 COPY 50-run-deployment.sh /docker-entrypoint.d
+RUN find /docker-entrypoint.d/ -type f -iname "*.sh" -exec chmod +x {} \;
