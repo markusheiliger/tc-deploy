@@ -1,0 +1,11 @@
+FROM markusheiliger/tcrunner:latest
+WORKDIR /
+
+RUN apk update && \
+    apk add bash jq py-pip && \
+    apk add --virtual azbuild gcc libffi-dev musl-dev openssl-dev python3-dev make && \
+    pip install --upgrade pip && \
+    pip install azure-cli && \
+    apk del --purge azbuild
+
+COPY 50-run-deployment.sh /docker-entrypoint.d

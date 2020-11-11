@@ -24,12 +24,30 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USR }}
           password: ${{ secrets.DOCKER_PWD }}
-          
+
+      - name: Build and push Docker image - runner
+        uses: docker/build-push-action@v2.1.0
+        with:
+          context: ./container/_core/runner
+          file: ./container/_core/runner/Dockerfile
+          platforms: linux/amd64
+          tags: markusheiliger/tcrunner:latest
+          push: true
+
+      - name: Build and push Docker image - watchdog
+        uses: docker/build-push-action@v2.1.0
+        with:
+          context: ./container/_core/watchdog
+          file: ./container/_core/watchdog/Dockerfile
+          platforms: linux/amd64
+          tags: markusheiliger/tcwatchdog:latest
+          push: true
+
       - name: Build and push Docker image - arm
         uses: docker/build-push-action@v2.1.0
         with:
-          context: ./runner/arm
-          file: ./runner/arm/Dockerfile
+          context: ./container/arm
+          file: ./container/arm/Dockerfile
           platforms: linux/amd64
           tags: markusheiliger/tcrarm:latest
           push: true
@@ -37,17 +55,9 @@ jobs:
       - name: Build and push Docker image - terraform
         uses: docker/build-push-action@v2.1.0
         with:
-          context: ./runner/terraform
-          file: ./runner/terraform/Dockerfile
+          context: ./container/terraform
+          file: ./container/terraform/Dockerfile
           platforms: linux/amd64
           tags: markusheiliger/tcrterraform:latest
           push: true
           
-      - name: Build and push Docker image - watchdog
-        uses: docker/build-push-action@v2.1.0
-        with:
-          context: ./runner/watchdog
-          file: ./runner/watchdog/Dockerfile
-          platforms: linux/amd64
-          tags: markusheiliger/tcwatchdog:latest
-          push: true
