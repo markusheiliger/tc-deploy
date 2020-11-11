@@ -223,6 +223,7 @@
                                 "restartPolicy": "Never",
                                 "ipAddress": {
                                     "type": "Public",
+                                    "dnsNameLabel": "[guid(parameters('environmentId'))]",
                                     "ports": [
                                         {
                                             "protocol": "tcp",
