@@ -49,7 +49,7 @@ jobs:
           context: ./container/arm
           file: ./container/arm/Dockerfile
           platforms: linux/amd64
-          tags: markusheiliger/tcrarm:latest
+          tags: markusheiliger/tcrunner-arm:latest
           push: true
 
       - name: Build and push Docker image - terraform
@@ -58,6 +58,6 @@ jobs:
           context: ./container/terraform
           file: ./container/terraform/Dockerfile
           platforms: linux/amd64
-          tags: markusheiliger/tcrterraform:latest
+          tags: markusheiliger/tcrunner-terraform:latest
           push: true
           
