@@ -1,7 +1,4 @@
 FROM nginx:stable-alpine
 WORKDIR /
 
-COPY nginx.conf /etc/nginx/nginx.conf
-ENV PATH="/teamcloud:${PATH}"
-
-
+COPY default.conf /etc/nginx/conf.d/default.conf
