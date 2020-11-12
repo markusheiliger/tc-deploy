@@ -213,7 +213,7 @@
                                                 },
                                                 {
                                                     "name": "EnvironmentLocation",
-                                                    "value": "[parameters('environmentId')]"
+                                                    "value": "[parameters('environmentLocation')]"
                                                 },
                                                 {
                                                     "name": "EnvironmentTemplateUrl",

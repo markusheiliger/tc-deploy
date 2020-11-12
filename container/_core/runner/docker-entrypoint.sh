@@ -36,7 +36,6 @@ if [[ ! -z "$EnvironmentSubscription" ]]; then
 
     done
 
-    trace "Initializing Azure"
     az account set --subscription $EnvironmentSubscription && \
     az account show
 fi
