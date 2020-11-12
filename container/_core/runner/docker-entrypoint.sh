@@ -6,7 +6,9 @@ trace() {
     echo -e "\n>>> $@ ...\n"
 }
 
-nginx 
+if [[ ! -z "$DeploymentHost" ]]; then
+    nginx && certbot --nginx --register-unsafely-without-email -n -d $DeploymentHost
+fi
 
 find "/docker-entrypoint.d/" -follow -type f -iname "*.sh" -print | sort -n | while read -r f; do
     if [ -x "$f" ]; then trace "Running '$f'"; "$f"; fi
