@@ -13,10 +13,10 @@ done
 trace "Starting template host"
 nginx & ps -p $!
 
-if [[ ! -z "$EnvironmentTemplate" ]]; then
+if [[ ! -z "$EnvironmentTemplateFile" ]]; then
 
     trace "Selecting template directory"
-    cd $(echo "$(dirname $EnvironmentTemplate)" | sed 's/^file:\/\///') && echo $PWD
+    cd $(echo "$(dirname $EnvironmentTemplateFile)" | sed 's/^file:\/\///') && echo $PWD
 fi
 
 if [[ ! -z "$EnvironmentSubscription" ]]; then
@@ -34,7 +34,6 @@ if [[ ! -z "$EnvironmentSubscription" ]]; then
 
     trace "Initializing Azure"
     az account set --subscription $EnvironmentSubscription && \
-    
     az account show
 fi
 

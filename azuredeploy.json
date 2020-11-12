@@ -117,6 +117,9 @@
                     "environmentId": {
                         "value": "[reference(concat(variables('EnvironmentResourceGroup'), '-Prepare')).outputs.environmentId.value]"
                     },
+                    "environmentLocation": {
+                        "value": "[parameters('environmentLocation')]"
+                    },
                     "environmentTemplatePath": {
                         "value": "[parameters('environmentTemplatePath')]"
                     },
@@ -141,6 +144,9 @@
                         "environmentId": {
                             "type": "string"
                         },
+                        "environmentLocation": {
+                            "type": "string"
+                        },
                         "environmentTemplatePath": {
                             "type": "string"
                         },
@@ -158,6 +164,7 @@
                         }
                     },
                     "variables": {
+                        "deploymentHost": "[concat(guid(parameters('environmentId')), '.', toLower(replace(parameters('environmentLocation'), ' ', '')), '.azurecontainer.io')]",
                         "environmentSegments": "[split(parameters('environmentId'), '/')]"
                     },
                     "resources": [
@@ -193,11 +200,27 @@
                                             },
                                             "environmentVariables": [
                                                 {
+                                                    "name": "DeploymentId",
+                                                    "value": "[guid(parameters('environmentId'))]"
+                                                },
+                                                {
+                                                    "name": "DeploymentHost",
+                                                    "value": "[variables('deploymentHost')]"
+                                                },
+                                                {
                                                     "name": "EnvironmentId",
                                                     "value": "[parameters('environmentId')]"
                                                 },
                                                 {
-                                                    "name": "EnvironmentTemplate",
+                                                    "name": "EnvironmentLocation",
+                                                    "value": "[parameters('environmentId')]"
+                                                },
+                                                {
+                                                    "name": "EnvironmentTemplateUrl",
+                                                    "value": "[uri(concat('http://', variables('deploymentHost')), if (startsWith(parameters('environmentTemplatePath'), '/'), skip(parameters('environmentTemplatePath'), 1), parameters('environmentTemplatePath')))]"
+                                                },
+                                                {
+                                                    "name": "EnvironmentTemplateFile",
                                                     "value": "[uri('file:///mnt/templates/root/', if (startsWith(parameters('environmentTemplatePath'), '/'), skip(parameters('environmentTemplatePath'), 1), parameters('environmentTemplatePath')))]"
                                                 },
                                                 {
