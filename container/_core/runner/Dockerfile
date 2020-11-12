@@ -15,7 +15,7 @@ RUN apk update && \
 
 # Configure entrypoint and extension scripts
 COPY docker-entrypoint.sh /docker-entrypoint.sh
-COPY docker-entrypoint.d /docker-entrypoint.d
+COPY docker-entrypoint.d/*.sh /docker-entrypoint.d/
 
 # Enable entrypoint and extension scripts
 RUN chmod +x /docker-entrypoint.sh && \
