@@ -28,20 +28,19 @@ else
         $ProvisioningState=$(az deployment group show --resource-group "$EnvironmentResourceGroup" --name "$DeploymentName" --query "properties.provisioningState" -o tsv)
 
         case "${ProvisioningState^^}" in
+
             *)
                 track $(az deployment operation group list --resource-group "$EnvironmentResourceGroup" --name "$DeploymentName")
                 ;;&
+        
             "CANCELED" | "FAILED" | "SUCCEEDED")
                 echo "DEPLOYMENT ${ProvisioningState^^}"
                 break
+        
         esac
 
     done
 fi
-
-
-
-
 
 tail -f /dev/null
 
