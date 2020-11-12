@@ -24,5 +24,5 @@ RUN chmod +x /docker-entrypoint.sh && \
 # Replace nginx configuration files
 COPY config/default.conf /etc/nginx/conf.d/default.conf
 
-CMD [ "tail -f /dev/null;" ]
+CMD [ "" ]
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
