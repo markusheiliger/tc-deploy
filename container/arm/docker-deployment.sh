@@ -9,7 +9,7 @@ if [ -z "$EnvironmentResourceGroup" ]; then
 
 else
 
-    az deployment group create  --resource-group "$EnvironmentResourceGroup"
+    az deployment group create  --resource-group "$EnvironmentResourceGroup" \
                                 --name "$DeploymentId" \
                                 --no-prompt true --verbose \
                                 --template-uri "$EnvironmentTemplateUrl" 
