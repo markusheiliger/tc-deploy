@@ -12,7 +12,7 @@
             "value": "https://github.com/markusheiliger/tc-environments"
         },
         "deploymentRunner": {
-            "value": "markusheiliger/tcrarm"
+            "value": "markusheiliger/tcrunner-arm"
         },
         "deploymentIdentity": {
             "value": "/subscriptions/35b14d48-eaff-4137-a96b-3a33013f7b74/resourceGroups/TeamCloudHome/providers/Microsoft.ManagedIdentity/userAssignedIdentities/tcdeploymentidentity"
