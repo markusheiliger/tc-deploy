@@ -4,7 +4,7 @@ FROM nginx:stable-alpine
 WORKDIR /
 
 RUN apk update && \
-    apk add --no-cache procps bash jq py-pip && \
+    apk add --no-cache bash jq python3 py-pip && \
     apk add --virtual azbuild gcc libffi-dev musl-dev openssl-dev python3-dev make && \
     pip3 install --upgrade pip && \
     pip3 install azure-cli && \
