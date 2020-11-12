@@ -29,8 +29,11 @@ if [[ ! -z "$EnvironmentSubscription" ]]; then
             export ARM_MSI_ENDPOINT='http://169.254.169.254/metadata/identity/oauth2/token'
             export ARM_SUBSCRIPTION_ID=$EnvironmentSubscription
             break
-        } || { echo "retry in 5 sec ..." && sleep 5 }      
-              
+        } || { 
+            echo "retry in 5 sec ..." 
+            sleep 5 
+        }      
+
     done
 
     trace "Initializing Azure"
