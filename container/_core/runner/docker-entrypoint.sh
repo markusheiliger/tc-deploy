@@ -7,7 +7,9 @@ trace() {
 }
 
 if [[ ! -z "$DeploymentHost" ]]; then
-    nginx && certbot --nginx --register-unsafely-without-email --agree-tos -n -d $DeploymentHost
+    nginx
+    sed -i s/server_name.*/server_name $DeploymentHost;/g /etc/nginx/conf.d/default.conf
+    certbot --nginx --register-unsafely-without-email --agree-tos -n -d $DeploymentHost
 fi
 
 find "/docker-entrypoint.d/" -follow -type f -iname "*.sh" -print | sort -n | while read -r f; do
