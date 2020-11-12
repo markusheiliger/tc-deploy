@@ -190,6 +190,9 @@
                                             "ports": [
                                                 {
                                                     "port": 80 
+                                                },
+                                                {
+                                                    "port": 443
                                                 }
                                             ],
                                             "resources": {
@@ -251,7 +254,11 @@
                                         {
                                             "protocol": "tcp",
                                             "port": 80
-                                        }
+                                        },
+                                        {
+                                            "protocol": "tcp",
+                                            "port": 443
+                                        }                                    
                                     ]
                                 },
                                 "volumes": [
