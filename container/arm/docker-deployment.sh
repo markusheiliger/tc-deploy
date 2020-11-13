@@ -25,7 +25,7 @@ else
 
         sleep 5
 
-        $ProvisioningState=$(az deployment group show --resource-group "$EnvironmentResourceGroup" --name "$DeploymentName" --query "properties.provisioningState" -o tsv)
+        ProvisioningState=$(az deployment group show --resource-group "$EnvironmentResourceGroup" --name "$DeploymentName" --query "properties.provisioningState" -o tsv)
 
         track $(az deployment operation group list --resource-group "$EnvironmentResourceGroup" --name "$DeploymentName")
         
