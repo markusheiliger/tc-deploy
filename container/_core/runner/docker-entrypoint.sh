@@ -25,7 +25,7 @@ fi
 if [[ ! -z "$EnvironmentSubscription" ]]; then
 
     trace "Connecting Azure"
-    az login --identity && {
+    az login --identity -o none && {
         export ARM_USE_MSI=true
         export ARM_MSI_ENDPOINT='http://169.254.169.254/metadata/identity/oauth2/token'
         export ARM_SUBSCRIPTION_ID=$EnvironmentSubscription
