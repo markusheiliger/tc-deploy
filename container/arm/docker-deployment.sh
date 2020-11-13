@@ -26,8 +26,9 @@ else
         sleep 5
 
         ProvisioningState=$(az deployment group show --resource-group "$EnvironmentResourceGroup" --name "$DeploymentName" --query "properties.provisioningState" -o tsv)
+        ProvisioningDetails=$(az deployment operation group list --resource-group "$EnvironmentResourceGroup" --name "$DeploymentName")
 
-        track $(az deployment operation group list --resource-group "$EnvironmentResourceGroup" --name "$DeploymentName")
+        track "$ProvisioningDetails"
         
         if [[ "CANCELED|FAILED|SUCCEEDED" == *"${ProvisioningState^^}"* ]]; then
 
