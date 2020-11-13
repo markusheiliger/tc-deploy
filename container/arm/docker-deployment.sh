@@ -19,24 +19,27 @@ else
     az deployment group create  --resource-group "$EnvironmentResourceGroup" \
                                 --name "$DeploymentName" \
                                 --no-prompt true --no-wait \
-                                --template-uri "$EnvironmentTemplateUrl" 
+                                --template-uri "$EnvironmentTemplateUrl"
 
-    while true; do
+    if [ $? -eq 0 ]; then # deployment successfully created
 
-        sleep 5
+        while true; do
 
-        ProvisioningState=$(az deployment group show --resource-group "$EnvironmentResourceGroup" --name "$DeploymentName" --query "properties.provisioningState" -o tsv)
-        ProvisioningDetails=$(az deployment operation group list --resource-group "$EnvironmentResourceGroup" --name "$DeploymentName")
+            sleep 5
 
-        track "$ProvisioningDetails"
-        
-        if [[ "CANCELED|FAILED|SUCCEEDED" == *"${ProvisioningState^^}"* ]]; then
+            ProvisioningState=$(az deployment group show --resource-group "$EnvironmentResourceGroup" --name "$DeploymentName" --query "properties.provisioningState" -o tsv)
+            ProvisioningDetails=$(az deployment operation group list --resource-group "$EnvironmentResourceGroup" --name "$DeploymentName")
 
-                echo "Deployment $DeploymentName: $ProvisioningState"
-                break
-        fi
+            track "$ProvisioningDetails"
+            
+            if [[ "CANCELED|FAILED|SUCCEEDED" == *"${ProvisioningState^^}"* ]]; then
 
-    done
+                    echo "Deployment $DeploymentName: $ProvisioningState"
+                    break
+            fi
+
+        done
+    fi
 fi
 
 tail -f /dev/null
