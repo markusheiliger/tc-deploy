@@ -15,6 +15,10 @@
             "type": "string",
             "defaultValue": ""
         },
+        "environmentTemplateParameters": {
+            "type": "object",
+            "defaultValue": {}
+        },
         "environmentLocation": {
             "type": "string",
             "defaultValue": "[deployment().location]"
@@ -129,7 +133,9 @@
                     "environmentTemplateRevision": {
                         "value": "[parameters('environmentTemplateRevision')]"
                     },
-
+                    "environmentTemplateParameters": {
+                        "value": "[parameters('environmentTemplateParameters')]"
+                    },
                     "deploymentRunner": {
                         "value": "[parameters('deploymentRunner')]"
                     },
@@ -155,6 +161,9 @@
                         },
                         "environmentTemplateRevision": {
                             "type": "string"
+                        },
+                        "environmentTemplateParameters": {
+                            "type": "object"
                         },
                         "deploymentRunner": {
                             "type": "string"
@@ -223,8 +232,16 @@
                                                     "value": "[uri(concat('http://', variables('deploymentHost')), if (startsWith(parameters('environmentTemplatePath'), '/'), skip(parameters('environmentTemplatePath'), 1), parameters('environmentTemplatePath')))]"
                                                 },
                                                 {
+                                                    "name": "EnvironmentTemplateToken",
+                                                    "value": "[uniqueString(resourceId('Microsoft.ContainerInstance/containerGroups', guid(parameters('environmentId'))))]"
+                                                },
+                                                {
                                                     "name": "EnvironmentTemplateFile",
                                                     "value": "[uri('file:///mnt/templates/root/', if (startsWith(parameters('environmentTemplatePath'), '/'), skip(parameters('environmentTemplatePath'), 1), parameters('environmentTemplatePath')))]"
+                                                },
+                                                {
+                                                    "name": "EnvironmentTemplateParameters",
+                                                    "value": "[string(parameters('environmentTemplateParameters'))]"
                                                 },
                                                 {
                                                     "name": "EnvironmentResourceGroup",
