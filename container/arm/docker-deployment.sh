@@ -11,11 +11,11 @@ EnvironmentTemplateParametersJson=$(echo "$EnvironmentTemplateParameters" | jq -
 EnvironmentTemplateParametersOpts=()
 
 $(cat "$EnvironmentTemplateFile" | jq --raw-output '.parameters | to_entries[] | select( .key | startswith("_artifactsLocation")) | .key' ) | while read p; do
-    case "$p"
-        "_artifactsLocation")
+    case "$p" in
+        _artifactsLocation)
             EnvironmentTemplateParametersOpts+=( --parameters _artifactsLocation="$(dirname EnvironmentTemplateUrlSecure)" )
             ;;
-        "_artifactsLocationSasToken")
+        _artifactsLocationSasToken)
             EnvironmentTemplateParametersOpts+=( --parameters _artifactsLocation="?code=EnvironmentTemplateUrlToken" )
             ;;
     esac
