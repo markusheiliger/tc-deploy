@@ -16,10 +16,10 @@ find "/docker-entrypoint.d/" -follow -type f -iname "*.sh" -print | sort -n | wh
     if [ -x "$f" ]; then trace "Running '$f'"; "$f"; fi
 done
 
-if [[ ! -z "$EnvironmentTemplateFile" ]]; then
+if [[ ! -z "$EnvironmentTemplateFolder" ]]; then
 
     trace "Selecting template directory"
-    cd $(echo "$(dirname $EnvironmentTemplateFile)" | sed 's/^file:\/\///') && echo $PWD
+    cd $(echo "$EnvironmentTemplateFolder" | sed 's/^file:\/\///') && echo $PWD
 fi
 
 if [[ ! -z "$EnvironmentSubscription" ]]; then
