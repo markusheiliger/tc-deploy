@@ -5,9 +5,10 @@ trackDeployment() {
     echo "$1"; 
 }
 
+EnvironmentDeploymentName="$(uuidgen)"
+EnvironmentTemplateFile="$EnvironmentTemplateFolder/azuredeploy.json"
 EnvironmentTemplateUrl="$EnvironmentTemplateBaseUrl/azuredeploy.json"
 EnvironmentTemplateUrlSecure="$(echo "$EnvironmentTemplateUrl" | sed 's/^http:/https:/g')"
-EnvironmentDeploymentName="$(uuidgen)"
 EnvironmentTemplateParametersJson=$(echo "$EnvironmentTemplateParameters" | jq --compact-output '{ "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#", "contentVersion": "1.0.0.0", "parameters": (to_entries | if length == 0 then {} else (map( { (.key): { "value": .value } } ) | add) end) }' )
 EnvironmentTemplateParametersOpts=()
 
