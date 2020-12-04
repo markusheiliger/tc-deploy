@@ -6,7 +6,7 @@ trackDeployment() {
 }
 
 EnvironmentDeploymentName="$(uuidgen)"
-EnvironmentTemplateFile="$(echo "$EnvironmentTemplateFolder/azuredeploy.json" | sed 's/^file:\/\///g'))"
+EnvironmentTemplateFile="$(echo "$EnvironmentTemplateFolder/azuredeploy.json" | sed 's/^file:\/\///g')"
 EnvironmentTemplateUrl="$(echo "$EnvironmentTemplateBaseUrl/azuredeploy.json" | sed 's/^http:/https:/g')"
 EnvironmentTemplateParametersJson=$(echo "$EnvironmentTemplateParameters" | jq --compact-output '{ "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#", "contentVersion": "1.0.0.0", "parameters": (to_entries | if length == 0 then {} else (map( { (.key): { "value": .value } } ) | add) end) }' )
 EnvironmentTemplateParametersOpts=()
