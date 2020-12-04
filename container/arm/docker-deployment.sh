@@ -2,7 +2,9 @@
 
 trackDeployment() { 
     
-    echo "$1"; 
+    trace=$(echo "$1" | jq --raw-output '.[] | select(.properties.targetResource != null) | "\(.properties.targetResource.id)\r\nOperation: \(.properties.provisioningOperation)\r\nStatus: \(.properties.provisioningState)\r\n"')
+    echo $trace
+     
 }
 
 EnvironmentDeploymentName="$(uuidgen)"
@@ -17,7 +19,7 @@ $(cat "$EnvironmentTemplateFile" | jq --raw-output '.parameters | to_entries[] |
             EnvironmentTemplateParametersOpts+=( --parameters _artifactsLocation="$(dirname EnvironmentTemplateUrl)" )
             ;;
         _artifactsLocationSasToken)
-            EnvironmentTemplateParametersOpts+=( --parameters _artifactsLocation="?code=EnvironmentTemplateUrlToken" )
+            EnvironmentTemplateParametersOpts+=( --parameters _artifactsLocationSasToken="?code=$EnvironmentTemplateUrlToken" )
             ;;
     esac
 done
