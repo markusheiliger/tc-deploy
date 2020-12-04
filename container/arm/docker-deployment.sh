@@ -6,16 +6,15 @@ trackDeployment() {
 }
 
 EnvironmentDeploymentName="$(uuidgen)"
-EnvironmentTemplateFile="$EnvironmentTemplateFolder/azuredeploy.json"
-EnvironmentTemplateUrl="$EnvironmentTemplateBaseUrl/azuredeploy.json"
-EnvironmentTemplateUrlSecure="$(echo "$EnvironmentTemplateUrl" | sed 's/^http:/https:/g')"
+EnvironmentTemplateFile="$(echo "$EnvironmentTemplateFolder/azuredeploy.json" | sed 's/^file:\/\///g'))"
+EnvironmentTemplateUrl="$(echo "$EnvironmentTemplateBaseUrl/azuredeploy.json" | sed 's/^http:/https:/g')"
 EnvironmentTemplateParametersJson=$(echo "$EnvironmentTemplateParameters" | jq --compact-output '{ "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#", "contentVersion": "1.0.0.0", "parameters": (to_entries | if length == 0 then {} else (map( { (.key): { "value": .value } } ) | add) end) }' )
 EnvironmentTemplateParametersOpts=()
 
 $(cat "$EnvironmentTemplateFile" | jq --raw-output '.parameters | to_entries[] | select( .key | startswith("_artifactsLocation")) | .key' ) | while read p; do
     case "$p" in
         _artifactsLocation)
-            EnvironmentTemplateParametersOpts+=( --parameters _artifactsLocation="$(dirname EnvironmentTemplateUrlSecure)" )
+            EnvironmentTemplateParametersOpts+=( --parameters _artifactsLocation="$(dirname EnvironmentTemplateUrl)" )
             ;;
         _artifactsLocationSasToken)
             EnvironmentTemplateParametersOpts+=( --parameters _artifactsLocation="?code=EnvironmentTemplateUrlToken" )
@@ -28,7 +27,7 @@ if [ -z "$EnvironmentResourceGroup" ]; then
     az deployment sub create    --location "$EnvironmentLocation" \
                                 --name "$EnvironmentDeploymentName" \
                                 --no-prompt true --no-wait \
-                                --template-uri "$EnvironmentTemplateUrlSecure" \
+                                --template-uri "$EnvironmentTemplateUrl" \
                                 --parameters "$EnvironmentTemplateParametersJson" \
                                 "${EnvironmentTemplateParametersOpts[@]}"
 
@@ -57,7 +56,7 @@ else
     az deployment group create  --resource-group "$EnvironmentResourceGroup" \
                                 --name "$EnvironmentDeploymentName" \
                                 --no-prompt true --no-wait \
-                                --template-uri "$EnvironmentTemplateUrlSecure" \
+                                --template-uri "$EnvironmentTemplateUrl" \
                                 --parameters "$EnvironmentTemplateParametersJson"
 
     if [ $? -eq 0 ]; then # deployment successfully created
