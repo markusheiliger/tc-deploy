@@ -4,7 +4,7 @@ trackDeployment() {
     
     trace=$(echo "$1" | jq --raw-output '.[] | select(.properties.targetResource != null) | "\(.properties.targetResource.id)\r\nOperation: \(.properties.provisioningOperation)\r\nStatus: \(.properties.provisioningState)\r\n"')
     echo $trace
-     
+
 }
 
 EnvironmentDeploymentName="$(uuidgen)"
@@ -82,5 +82,5 @@ else
     fi
 fi
 
-tail -f /dev/null
+# tail -f /dev/null
 
