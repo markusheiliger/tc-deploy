@@ -2,7 +2,7 @@
 
 trackDeployment() { 
     
-    trace=$(echo "$1" | jq --raw-output '.[] | select(.properties.targetResource != null) | "\(.properties.targetResource.id)\r\nOperation: \(.properties.provisioningOperation)\r\nStatus: \(.properties.provisioningState)\r\n"')
+    trace=$(echo "$1" | jq --raw-output '.[] | select(.properties.targetResource != null) | "\(.properties.targetResource.id)\nOperation: \(.properties.provisioningOperation)\nStatus: \(.properties.provisioningState)\n"')
     echo $trace
 
 }
