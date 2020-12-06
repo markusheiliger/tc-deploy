@@ -1,9 +1,11 @@
 #!/bin/bash
 
 trackDeployment() { 
-    
-    trace=$(echo "$1" | jq --raw-output '.[] | select(.properties.targetResource != null) | "\(.properties.targetResource.id)\nOperation: \(.properties.provisioningOperation)\nStatus: \(.properties.provisioningState)\n"')
-    echo $trace
+
+    echo "=========================================================================="    
+    echo "$1"
+    echo "--------------------------------------------------------------------------"    
+    echo "$(echo "$1" | jq --raw-output '.[] | select(.properties.targetResource != null) | "\(.properties.targetResource.id)\nOperation: \(.properties.provisioningOperation)\nStatus: \(.properties.provisioningState)\n"' | sed 's/\\n/\n/g')"
 
 }
 
