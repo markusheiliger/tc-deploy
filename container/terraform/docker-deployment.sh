@@ -5,7 +5,7 @@ trace() {
 }
 
 trace "Initializing Terraform"
-terraform init
+terraform init -no-color
 
 trace "Applying Terraform Plan"
 terraform apply -no-color -auto-approve -var "EnvironmentResourceGroupName=$EnvironmentResourceGroup"
