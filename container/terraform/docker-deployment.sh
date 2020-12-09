@@ -8,6 +8,6 @@ trace "Initializing Terraform"
 terraform init
 
 trace "Applying Terraform Plan"
-terraform apply -auto-approve -var "EnvironmentResourceGroupName=$EnvironmentResourceGroup"
+terraform apply -no-color -auto-approve -var "EnvironmentResourceGroupName=$EnvironmentResourceGroup"
 
-tail -f /dev/null
+# tail -f /dev/null
