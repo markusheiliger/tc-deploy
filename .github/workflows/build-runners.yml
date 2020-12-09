@@ -34,15 +34,6 @@ jobs:
           tags: markusheiliger/tcrunner:latest
           push: true
 
-      # - name: Build and push Docker image - watchdog
-      #   uses: docker/build-push-action@v2.1.0
-      #   with:
-      #     context: ./container/_core/watchdog
-      #     file: ./container/_core/watchdog/Dockerfile
-      #     platforms: linux/amd64
-      #     tags: markusheiliger/tcwatchdog:latest
-      #     push: true
-
       - name: Build and push Docker image - arm
         uses: docker/build-push-action@v2.1.0
         with:
@@ -52,12 +43,12 @@ jobs:
           tags: markusheiliger/tcrunner-arm:latest
           push: true
 
-      # - name: Build and push Docker image - terraform
-      #   uses: docker/build-push-action@v2.1.0
-      #   with:
-      #     context: ./container/terraform
-      #     file: ./container/terraform/Dockerfile
-      #     platforms: linux/amd64
-      #     tags: markusheiliger/tcrunner-terraform:latest
-      #     push: true
+      - name: Build and push Docker image - terraform
+        uses: docker/build-push-action@v2.1.0
+        with:
+          context: ./container/terraform
+          file: ./container/terraform/Dockerfile
+          platforms: linux/amd64
+          tags: markusheiliger/tcrunner-terraform:latest
+          push: true
           

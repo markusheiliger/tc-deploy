@@ -1,16 +1,9 @@
-FROM hashicorp/terraform:light
+FROM markusheiliger/tcrunner:latest
 WORKDIR /
 
-RUN apk update && \
-    apk add bash jq py-pip && \
-    apk add --virtual azbuild gcc libffi-dev musl-dev openssl-dev python3-dev make && \
-    pip install --upgrade pip && \
-    pip install azure-cli && \
-    apk del --purge azbuild
+RUN apk add terraform
 
-COPY runner.sh /teamcloud/runner
-RUN chmod +x /teamcloud/runner
-ENV PATH="/teamcloud:${PATH}"
+COPY docker-deployment.sh /docker-deployment.sh
+RUN chmod +x /docker-deployment.sh
 
-ENTRYPOINT [ "runner" ]
-
+CMD [ "/docker-deployment.sh" ]
