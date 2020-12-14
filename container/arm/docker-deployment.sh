@@ -29,14 +29,16 @@ $(cat "$EnvironmentTemplateFile" | jq --raw-output '.parameters | to_entries[] |
     esac
 done
 
+DeploymentOutput=""
+
 if [ -z "$EnvironmentResourceGroup" ]; then
 
-    az deployment sub create    --location "$EnvironmentLocation" \
-                                --name "$EnvironmentDeploymentName" \
-                                --no-prompt true --no-wait \
-                                --template-uri "$EnvironmentTemplateUrl" \
-                                --parameters "$EnvironmentTemplateParametersJson" \
-                                "${EnvironmentTemplateParametersOpts[@]}"
+    DeploymentOutput=$(az deployment sub create --location "$EnvironmentLocation" \
+                                                --name "$EnvironmentDeploymentName" \
+                                                --no-prompt true --no-wait \
+                                                --template-uri "$EnvironmentTemplateUrl" \
+                                                --parameters "$EnvironmentTemplateParametersJson" \
+                                                "${EnvironmentTemplateParametersOpts[@]}")
 
     if [ $? -eq 0 ]; then # deployment successfully created
 
@@ -60,11 +62,11 @@ if [ -z "$EnvironmentResourceGroup" ]; then
 
 else
 
-    az deployment group create  --resource-group "$EnvironmentResourceGroup" \
-                                --name "$EnvironmentDeploymentName" \
-                                --no-prompt true --no-wait \
-                                --template-uri "$EnvironmentTemplateUrl" \
-                                --parameters "$EnvironmentTemplateParametersJson"
+    DeploymentOutput=$(az deployment group create   --resource-group "$EnvironmentResourceGroup" \
+                                                    --name "$EnvironmentDeploymentName" \
+                                                    --no-prompt true --no-wait \
+                                                    --template-uri "$EnvironmentTemplateUrl" \
+                                                    --parameters "$EnvironmentTemplateParametersJson")
 
     if [ $? -eq 0 ]; then # deployment successfully created
 
@@ -85,6 +87,12 @@ else
 
         done
     fi
+fi
+
+if [ ! -z "$DeploymentOutput" ]; then
+
+    echo "ERROR: $DeploymentOutput"
+
 fi
 
 # tail -f /dev/null
