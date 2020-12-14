@@ -91,7 +91,8 @@ fi
 
 if [ ! -z "$DeploymentOutput" ]; then
 
-    echo "ERROR: $DeploymentOutput"
+    DeploymentOutputTrace=$(echo "$DeploymentOutput" | jq --raw-output '.[] | .details[] | "Error: \(.message)\n"' | sed 's/\\n/\n/g'))
+    echo $DeploymentOutputTrace && exit 1 # our script failed to enqueue a new deployment - we return a none zero exit code to inidicate this
 
 fi
 
