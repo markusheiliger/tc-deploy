@@ -93,6 +93,7 @@ if [ ! -z "$DeploymentOutput" ]; then
 
     if [ $(echo "$DeploymentOutput" | jq empty > /dev/null 2>&1; echo $?) -eq 0 ]; then
 
+        echo "DeploymentOutput: $DeploymentOutput"
         $DeploymentOutput=$(echo "$DeploymentOutput" | jq --raw-output '.[] | .details[] | "Error: \(.message)\n"' | sed 's/\\n/\n/g')
     fi
 
