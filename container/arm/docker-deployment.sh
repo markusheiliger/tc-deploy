@@ -93,7 +93,7 @@ if [ ! -z "$DeploymentOutput" ]; then
 
     if [ $(echo "$DeploymentOutput" | jq empty > /dev/null 2>&1; echo $?) -eq 0 ]; then
 
-        $DeploymentOutput=$(echo "$DeploymentOutput" | jq --raw-output '.[] | .details[] | "Error: \(.message)\n"' | sed 's/\\n/\n/g'))
+        $DeploymentOutput=$(echo "$DeploymentOutput" | jq --raw-output '.[] | .details[] | "Error: \(.message)\n"' | sed 's/\\n/\n/g')
     fi
 
     echo "$DeploymentOutput" && exit 1 # our script failed to enqueue a new deployment - we return a none zero exit code to inidicate this
