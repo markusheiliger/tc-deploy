@@ -38,7 +38,7 @@ if [ -z "$EnvironmentResourceGroup" ]; then
                                                 --no-prompt true --no-wait \
                                                 --template-uri "$EnvironmentTemplateUrl" \
                                                 --parameters "$EnvironmentTemplateParametersJson" \
-                                                "${EnvironmentTemplateParametersOpts[@]}")
+                                                "${EnvironmentTemplateParametersOpts[@]}" 2>&1)
 
     if [ $? -eq 0 ]; then # deployment successfully created
 
@@ -66,7 +66,7 @@ else
                                                     --name "$EnvironmentDeploymentName" \
                                                     --no-prompt true --no-wait \
                                                     --template-uri "$EnvironmentTemplateUrl" \
-                                                    --parameters "$EnvironmentTemplateParametersJson")
+                                                    --parameters "$EnvironmentTemplateParametersJson" 2>&1)
 
     if [ $? -eq 0 ]; then # deployment successfully created
 
