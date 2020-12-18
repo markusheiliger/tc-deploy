@@ -7,8 +7,8 @@ RUN apk update \
     && apk add --no-cache certbot certbot-nginx bash jq python3 py-pip util-linux \
     # Build and install Azure CLI
     && apk add --virtual azbuild gcc libffi-dev musl-dev openssl-dev python3-dev make \
-    && pip3 install --upgrade pip \
-    && pip3 install azure-cli \
+    && pip3 install --upgrade pip \    
+    && pip3 install wheel azure-cli \
     && apk del --purge azbuild \
     # Reset nginx log and error forwarding
     && ln -n /var/log/nginx/access.log \
