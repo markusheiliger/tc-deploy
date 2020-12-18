@@ -23,8 +23,8 @@ COPY docker-runner.d/*.sh /docker-runner.d/
 
 # Enable entrypoint and extension scripts
 RUN chmod +x /docker-entrypoint.sh \
-    && find /docker-entrypoint.d/ -type f -iname "*.sh" -exec chmod +x {} \; \
-    && find /docker-runner.d/ -type f -iname "*.sh" -exec chmod +x {} \;
+    && find /docker-entrypoint.d/ -type f -iname "*.sh" -exec chmod +x {} \
+    && find /docker-runner.d/ -type f -iname "*.sh" -exec chmod +x {} 
 
 # Replace nginx configuration files
 COPY config/default.conf /etc/nginx/conf.d/default.conf
