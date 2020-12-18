@@ -21,10 +21,10 @@ COPY docker-entrypoint.sh /docker-entrypoint.sh
 COPY docker-entrypoint.d/*.sh /docker-entrypoint.d/
 COPY docker-runner.d/*.sh /docker-runner.d/
 
-# Enable entrypoint and extension scripts
-RUN chmod +x /docker-entrypoint.sh \
-    && find /docker-entrypoint.d/ -type f -iname "*.sh" -exec chmod +x {} \
-    && find /docker-runner.d/ -type f -iname "*.sh" -exec chmod +x {} 
+# Enable entrypoint and extension scripts (DONT try to combine multiple find operations)
+RUN chmod +x /docker-entrypoint.sh
+RUN find /docker-entrypoint.d/ -type f -iname "*.sh" -exec chmod +x {} \;
+RUN find /docker-runner.d/ -type f -iname "*.sh" -exec chmod +x {} \;
 
 # Replace nginx configuration files
 COPY config/default.conf /etc/nginx/conf.d/default.conf
