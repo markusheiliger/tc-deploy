@@ -1,7 +1,5 @@
 FROM markusheiliger/tcrunner:latest
 WORKDIR /
 
-COPY docker-deployment.sh /docker-deployment.sh
-RUN chmod +x /docker-deployment.sh
-
-CMD [ "/docker-deployment.sh" ]
+COPY docker-runner.d/*.sh /docker-runner.d/
+RUN find /docker-runner.d/ -type f -iname "*.sh" -exec chmod +x {} \;
