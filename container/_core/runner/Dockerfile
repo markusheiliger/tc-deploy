@@ -18,13 +18,15 @@ RUN apk update \
     && rm /docker-entrypoint.d/*
 
 COPY docker-entrypoint.sh /docker-entrypoint.sh
-COPY docker-entrypoint.d/*.sh /docker-entrypoint.d/
-COPY docker-runner.d/*.sh /docker-runner.d/
-
-# Enable entrypoint and extension scripts (DONT try to combine multiple find operations)
 RUN chmod +x /docker-entrypoint.sh
-RUN find /docker-entrypoint.d/ -type f -iname "*.sh" -exec chmod +x {} \;
-RUN find /docker-runner.d/ -type f -iname "*.sh" -exec chmod +x {} \;
+
+COPY docker-entrypoint.d/*.sh /docker-entrypoint.d/
+RUN mkdir -p /docker-entrypoint.d \
+    && find /docker-entrypoint.d/ -type f -iname "*.sh" -exec chmod +x {} \;
+
+COPY docker-runner.d/*.sh /docker-runner.d/
+RUN mkdir -p /docker-runner.d \
+    && find /docker-runner.d/ -type f -iname "*.sh" -exec chmod +x {} \;
 
 # Replace nginx configuration files
 COPY config/default.conf /etc/nginx/conf.d/default.conf
