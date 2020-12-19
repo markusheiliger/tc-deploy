@@ -43,14 +43,16 @@ fi
 script="$@" # we start with the script provided by docker CMD
 
 if [[ -z "$@" ]]; then
+
     # if no script was provided via command arguments we need to fallback 
     # to the deployment type based runner script located in /docker-runner.d
     script="$(find /docker-runner.d -maxdepth 1 -iname "$DeploymentType.sh")"
-fi
 
-if [[ ! -f "$script"  ]]; then
-    # the script file does not exists - lets return something meaningful
-    error "Unable to find script: $script" && exit 1
+    if [[ -z "$script" ]]; then 
+        # there is no scipt availabe to handle our deployment type
+        error "Deployment type $DeploymentType is not supported." && exit 1
+    fi
+    
 fi
 
 trace "Executing script"
