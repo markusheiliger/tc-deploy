@@ -20,11 +20,11 @@ RUN apk update \
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
-COPY docker-entrypoint.d/*.sh /docker-entrypoint.d/
+COPY docker-entrypoint.d/* /docker-entrypoint.d/
 RUN mkdir -p /docker-entrypoint.d \
     && find /docker-entrypoint.d/ -type f -iname "*.sh" -exec chmod +x {} \;
 
-COPY docker-runner.d/*.sh /docker-runner.d/
+COPY docker-runner.d/* /docker-runner.d/
 RUN mkdir -p /docker-runner.d \
     && find /docker-runner.d/ -type f -iname "*.sh" -exec chmod +x {} \;
 
