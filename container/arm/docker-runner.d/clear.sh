@@ -1,11 +1,29 @@
 #!/bin/bash
 DIR=$(dirname "$0")
 
+trackDeploymentHistory=()
+
 trackDeployment() { 
 
-    echo -e "$1\n"
-    trace="$( echo "$1" | jq --raw-output '.[] | select(.properties.targetResource != null) | "\(.properties.targetResource.id)\nOperation: \(.properties.provisioningOperation)\nStatus: \(.properties.provisioningState)\n"' | sed 's/\\n/\n/g' )" 
-    echo -e "$trace\n"
+    $( echo "$1" | jq --raw-output '.[] | [.operationId, .properties.timestamp, .properties.provisioningOperation, .properties.provisioningState, .properties.targetResource.id // ""] | @tsv' ) | while read line; do
+        if [[ ! -z "$line" ] && [ "${trackDeploymentHistory[@]}" == *"$line"* ]]; then
+
+            timestamp=$( echo "$line" | cut -f 2 | cut -d . -f 1 | sed 's/T/ /g' )
+            operation=$( echo "$line" | cut -f 3 )
+            operationState=$( echo "$line" | cut -f 4 )
+            operationTarget=$( echo "$line" | cut -f 5 )
+
+            echo "\n$timestamp\t$operaton ($operationState)"
+            
+            if [[ ! -z "$operationTarget" ]]; then
+                echo "\t\t$operationTarget"
+            fi
+
+            trackDeploymentHistory+=("$l")
+
+        fi
+    done
+
 }
 
 deleteResourceGroup() {
