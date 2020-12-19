@@ -4,7 +4,7 @@ trackDeploymentHistory=()
 
 trackDeployment() { 
 
-    "$( echo "$1" | jq --raw-output '.[] | [.operationId, .properties.timestamp, .properties.provisioningOperation, .properties.provisioningState, .properties.targetResource.id // ""] | @tsv' )" | while read line; do        
+    $( echo "$1" | jq --raw-output '.[] | [.operationId, .properties.timestamp, .properties.provisioningOperation, .properties.provisioningState, .properties.targetResource.id // ""] | @tsv' ) | while read -r line; do        
         echo "\n>>> $line"
         if [ ! -z "$line" ] && [ "${trackDeploymentHistory[@]}" == *"$line"* ]; then
 
