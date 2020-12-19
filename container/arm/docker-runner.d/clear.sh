@@ -9,8 +9,10 @@ trackDeployment() {
 
 deleteResourceGroup() {
 
+    EnvironmentDeploymentName="$(uuidgen)"
     EnvironmentResourceGroup="$1" 
-    echo -e "\nDeleting resource group: $EnvironmentResourceGroup"
+    
+    echo -e "Deleting resource group: $EnvironmentResourceGroup"
 
     DeploymentOutput=$(az deployment group create   --resource-group "$EnvironmentResourceGroup" \
                                                     --name "$EnvironmentDeploymentName" \
