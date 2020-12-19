@@ -8,7 +8,7 @@ trackDeployment() {
     
     echo "$trace" | while read -r line; do        
         echo -e "\n>>> $line"
-        if [ ! -z "$line" ] && [ "${trackDeploymentHistory[@]}" != *"$line"* ]; then
+        if [[ ! -z "$line" ]] && [[ "${trackDeploymentHistory[@]}" != *"$line"* ]]; then
 
             timestamp="$( echo "$line" | cut -f 2 | cut -d . -f 1 | sed 's/T/ /g' )"
             operation="$( echo "$line" | cut -f 3 )"
