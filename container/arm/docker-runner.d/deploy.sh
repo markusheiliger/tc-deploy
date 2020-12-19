@@ -3,13 +3,7 @@
 trackDeployment() { 
 
     trace="$( echo "$1" | jq --raw-output '.[] | select(.properties.targetResource != null) | "\(.properties.targetResource.id)\nOperation: \(.properties.provisioningOperation)\nStatus: \(.properties.provisioningState)\n"' | sed 's/\\n/\n/g' )" 
-
-    # echo "=========================================================================="    
-    # echo "$1"
-    # echo "--------------------------------------------------------------------------"    
-    
     echo -e "$trace\n"
-
 }
 
 EnvironmentDeploymentName="$(uuidgen)"
@@ -44,7 +38,7 @@ if [ -z "$EnvironmentResourceGroup" ]; then
 
         while true; do
 
-            sleep 5
+            sleep 1
 
             ProvisioningState=$(az deployment sub show --name "$EnvironmentDeploymentName" --query "properties.provisioningState" -o tsv)
             ProvisioningDetails=$(az deployment operation sub list --name "$EnvironmentDeploymentName")
@@ -53,8 +47,8 @@ if [ -z "$EnvironmentResourceGroup" ]; then
             
             if [[ "CANCELED|FAILED|SUCCEEDED" == *"${ProvisioningState^^}"* ]]; then
 
-                    echo "Deployment $EnvironmentDeploymentName: $ProvisioningState"
-                    break
+                echo "Deployment $EnvironmentDeploymentName: $ProvisioningState"
+                break
             fi
 
         done
@@ -72,7 +66,7 @@ else
 
         while true; do
 
-            sleep 5
+            sleep 1
 
             ProvisioningState=$(az deployment group show --resource-group "$EnvironmentResourceGroup" --name "$EnvironmentDeploymentName" --query "properties.provisioningState" -o tsv)
             ProvisioningDetails=$(az deployment operation group list --resource-group "$EnvironmentResourceGroup" --name "$EnvironmentDeploymentName")
@@ -81,8 +75,8 @@ else
             
             if [[ "CANCELED|FAILED|SUCCEEDED" == *"${ProvisioningState^^}"* ]]; then
 
-                    echo "Deployment $EnvironmentDeploymentName: $ProvisioningState"
-                    break
+                echo "Deployment $EnvironmentDeploymentName: $ProvisioningState"
+                break
             fi
 
         done
@@ -100,6 +94,4 @@ if [ ! -z "$DeploymentOutput" ]; then
     echo "$DeploymentOutput" && exit 1 # our script failed to enqueue a new deployment - we return a none zero exit code to inidicate this
 
 fi
-
-# tail -f /dev/null
 

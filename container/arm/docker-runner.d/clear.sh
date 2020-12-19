@@ -1,11 +1,53 @@
 #!/bin/bash
+DIR=$(dirname "$0")
+
+trackDeployment() { 
+
+    trace="$( echo "$1" | jq --raw-output '.[] | select(.properties.targetResource != null) | "\(.properties.targetResource.id)\nOperation: \(.properties.provisioningOperation)\nStatus: \(.properties.provisioningState)\n"' | sed 's/\\n/\n/g' )" 
+    echo -e "$trace\n"
+}
 
 deleteResourceGroup() {
 
-    echo -e "\n>>> Deleting resource group: $1"
-    echo -e "\nDeleting locks ..." && az lock delete -g $1
-    echo -e "\nDeleting resources ..." && az group delete -g $1 -y
+    EnvironmentResourceGroup="$1" 
+    echo -e "\nDeleting resource group: $EnvironmentResourceGroup"
 
+    DeploymentOutput=$(az deployment group create   --resource-group "$EnvironmentResourceGroup" \
+                                                    --name "$EnvironmentDeploymentName" \
+                                                    --no-prompt true --no-wait \
+                                                    --template-file "$DIR/clear.json" 2>&1)
+
+    if [ $? -eq 0 ]; then # deployment successfully created
+
+        while true; do
+
+            sleep 1
+
+            ProvisioningState=$(az deployment group show --resource-group "$EnvironmentResourceGroup" --name "$EnvironmentDeploymentName" --query "properties.provisioningState" -o tsv)
+            ProvisioningDetails=$(az deployment operation group list --resource-group "$EnvironmentResourceGroup" --name "$EnvironmentDeploymentName")
+
+            trackDeployment "$ProvisioningDetails"
+            
+            if [[ "CANCELED|FAILED|SUCCEEDED" == *"${ProvisioningState^^}"* ]]; then
+
+                echo "Deployment $EnvironmentDeploymentName: $ProvisioningState"
+                break
+            fi
+
+        done
+    fi
+
+    if [ ! -z "$DeploymentOutput" ]; then
+
+        if [ $(echo "$DeploymentOutput" | jq empty > /dev/null 2>&1; echo $?) -eq 0 ]; then
+
+            DeploymentOutput="$( echo $DeploymentOutput | jq --raw-output '.[] | .details[] | "Error: \(.message)\n"' | sed 's/\\n/\n/g'  )"
+
+        fi
+
+        echo "$DeploymentOutput" && exit 1 # our script failed to enqueue a new deployment - we return a none zero exit code to inidicate this
+
+    fi
 }
 
 if [ -z "$EnvironmentResourceGroup" ]; then
@@ -19,5 +61,3 @@ else
     deleteResourceGroup "$EnvironmentResourceGroup"
 
 fi
-
-
