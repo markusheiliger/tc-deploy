@@ -3,6 +3,7 @@ DIR=$(dirname "$0")
 
 trackDeployment() { 
 
+    echo -e "$1\n"
     trace="$( echo "$1" | jq --raw-output '.[] | select(.properties.targetResource != null) | "\(.properties.targetResource.id)\nOperation: \(.properties.provisioningOperation)\nStatus: \(.properties.provisioningState)\n"' | sed 's/\\n/\n/g' )" 
     echo -e "$trace\n"
 }
