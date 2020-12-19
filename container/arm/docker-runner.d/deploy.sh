@@ -58,7 +58,7 @@ else
 
     DeploymentOutput=$(az deployment group create   --resource-group "$EnvironmentResourceGroup" \
                                                     --name "$EnvironmentDeploymentName" \
-                                                    --no-prompt true --no-wait \
+                                                    --no-prompt true --no-wait --mode Complete \
                                                     --template-uri "$EnvironmentTemplateUrl" \
                                                     --parameters "$EnvironmentTemplateParametersJson" 2>&1)
 
