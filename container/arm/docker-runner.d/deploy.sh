@@ -5,7 +5,7 @@ trackDeploymentHistory=()
 trackDeployment() { 
 
     $( echo "$1" | jq --raw-output '.[] | [.operationId, .properties.timestamp, .properties.provisioningOperation, .properties.provisioningState, .properties.targetResource.id // ""] | @tsv' ) | while read line; do
-        if [[ ! -z "$line" ] && [ "${trackDeploymentHistory[@]}" == *"$line"* ]]; then
+        if [ ! -z "$line" ] && [ "${trackDeploymentHistory[@]}" == *"$line"* ]; then
 
             timestamp=$( echo "$line" | cut -f 2 | cut -d . -f 1 | sed 's/T/ /g' )
             operation=$( echo "$line" | cut -f 3 )
