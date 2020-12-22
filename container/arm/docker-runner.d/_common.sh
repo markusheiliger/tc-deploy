@@ -15,20 +15,18 @@ trackDeployment() {
             operationType="$( echo "$line" | cut -f 3 )"
             operationState="$( echo "$line" | cut -f 4 )"
             operationTarget="$( echo "$line" | cut -f 5 )"
-            operationHash="$operationId|$operationState"
+            operationHash="$( echo "$operationId$operationState" )"
 
             if [[ "${TrackedOperationHashes[@]}" != *"$operationHash"* ]]; then
 
                 echo -e "\n$operationTimestamp\t$operationId - $operationType ($operationState)"
+                echo -e "\t\t\tTracked: ${TrackedOperationHashes[@]}"
                 
                 if [[ ! -z "$operationTarget" ]]; then
                     echo -e "\t\t\t$operationTarget"
                 fi
 
                 TrackedOperationHashes+=("$operationHash")
-            else
-
-                echo -e "\n!!! $operationHash already tracked"
 
             fi
         fi
