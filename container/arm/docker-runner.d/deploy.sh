@@ -1,6 +1,6 @@
 #!/bin/bash
 DIR=$(dirname "$0")
-. _common.sh
+. $DIR/_common.sh
 
 EnvironmentDeploymentName="$(uuidgen)"
 EnvironmentTemplateFile="$(echo "$EnvironmentTemplateFolder/azuredeploy.json" | sed 's/^file:\/\///g')"
