@@ -15,7 +15,7 @@ trackDeployment() {
             operationType="$( echo "$line" | cut -f 3 )"
             operationState="$( echo "$line" | cut -f 4 )"
             operationTarget="$( echo "$line" | cut -f 5 )"
-            operationHash ="$operationId|$operationState"
+            operationHash="$operationId|$operationState"
 
             if [[ "${TrackedOperationHashes[@]}" != *"$operationHash"* ]]; then
 
