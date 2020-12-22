@@ -43,7 +43,7 @@ if [ -z "$EnvironmentResourceGroup" ]; then
             
             if [[ "CANCELED|FAILED|SUCCEEDED" == *"${ProvisioningState^^}"* ]]; then
 
-                echo "Deployment $EnvironmentDeploymentName: $ProvisioningState"
+                echo -e "\nDeployment $EnvironmentDeploymentName: $ProvisioningState"
                 break
             fi
 
@@ -71,7 +71,7 @@ else
             
             if [[ "CANCELED|FAILED|SUCCEEDED" == *"${ProvisioningState^^}"* ]]; then
 
-                echo "Deployment $EnvironmentDeploymentName: $ProvisioningState"
+                echo -e "\nDeployment $EnvironmentDeploymentName: $ProvisioningState"
                 break
             fi
 
