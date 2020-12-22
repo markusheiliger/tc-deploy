@@ -17,7 +17,7 @@ trackDeployment() {
             operationTarget="$( echo "$line" | cut -f 5 )"
             operationHash ="$operationId|$operationState"
 
-            if [[ "${TrackedOperationHashes[@]}" != *"$operationHash"* ) ]]; then
+            if [[ "${TrackedOperationHashes[@]}" != *"$operationHash"* ]]; then
 
                 echo -e "\n$operationTimestamp\t$operationType ($operationState)"
                 
