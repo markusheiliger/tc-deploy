@@ -39,17 +39,18 @@ if [[ ! -z "$EnvironmentSubscription" ]]; then
     trace "Connecting Azure"
     while true; do
         # managed identity isn't available directly - retry after a short nap
-        az login --identity 2>/dev/null && {
+        az login --identity -o none 2>/dev/null && {
             export ARM_USE_MSI=true
             export ARM_MSI_ENDPOINT='http://169.254.169.254/metadata/identity/oauth2/token'
             export ARM_SUBSCRIPTION_ID=$EnvironmentSubscription
+            break
         } || sleep 5    
     done
 
     trace "Selecting Subscription"
     az account set --subscription $EnvironmentSubscription
     echo "$(az account show -o json | jq --raw-output '"\(.name) (\(.id))"')"
-    
+
 fi
 
 script="$@" # we start with the script provided by docker CMD
