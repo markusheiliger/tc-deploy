@@ -1,6 +1,14 @@
 #!/bin/bash
 
 set -e
+trap 'catch $? $LINENO' EXIT
+
+catch() {
+  if [ "$1" != "0" ]; then
+    # error handling goes here
+    echo "Error $1 occurred on $2"
+  fi
+}
 
 trace() {
     echo -e "\n>>> $@ ...\n"
@@ -29,15 +37,19 @@ fi
 if [[ ! -z "$EnvironmentSubscription" ]]; then
 
     trace "Connecting Azure"
-    az login --identity -o none && {
-        export ARM_USE_MSI=true
-        export ARM_MSI_ENDPOINT='http://169.254.169.254/metadata/identity/oauth2/token'
-        export ARM_SUBSCRIPTION_ID=$EnvironmentSubscription
-    }
+    while true; do
+        # managed identity isn't available directly - retry after a short nap
+        az login --identity 2>/dev/null && {
+            export ARM_USE_MSI=true
+            export ARM_MSI_ENDPOINT='http://169.254.169.254/metadata/identity/oauth2/token'
+            export ARM_SUBSCRIPTION_ID=$EnvironmentSubscription
+        } || sleep 5    
+    done
 
-    # selecting subscription and 
-    az account set --subscription $EnvironmentSubscription && \
+    trace "Selecting Subscription"
+    az account set --subscription $EnvironmentSubscription
     echo "$(az account show -o json | jq --raw-output '"\(.name) (\(.id))"')"
+    
 fi
 
 script="$@" # we start with the script provided by docker CMD
