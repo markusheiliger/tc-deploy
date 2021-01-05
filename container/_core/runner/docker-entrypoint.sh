@@ -25,9 +25,14 @@ exec 1>$LOG_FILE    # forward stdout to log file
 exec 2>&1           # redirect stderr to stdout
 
 if [[ ! -z "$DeploymentHost" ]]; then
+
     sed -i "s/server_name.*/server_name $DeploymentHost;/g" /etc/nginx/conf.d/default.conf
     nginx # start nginx and acquire SSL certificate from lets encrypt for our hostname
-    certbot --nginx --register-unsafely-without-email --agree-tos --quiet -n -d $DeploymentHost
+
+    while true; do
+        # there is a chance that nginx isn't ready to respond the ssl challenge - so retry if this operation fails
+        certbot --nginx --register-unsafely-without-email --agree-tos --quiet -n -d $DeploymentHost && break || sleep 1
+    done
 fi
 
 find "/docker-entrypoint.d/" -follow -type f -iname "*.sh" -print | sort -n | while read -r f; do
