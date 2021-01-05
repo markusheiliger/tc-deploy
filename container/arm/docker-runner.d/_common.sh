@@ -5,6 +5,8 @@ declare -g TrackedOperationHashes=()
 
 trackDeployment() { 
 
+    echo -e "\nTracked operations: ${#TrackedOperationHashes[@]}"
+
     trace="$( echo "$1" | jq --raw-output '.[] | [.operationId, .properties.timestamp, .properties.provisioningOperation, .properties.provisioningState, .properties.targetResource.id // ""] | @tsv' )"
     
     echo "$trace" | while read -r line; do 
@@ -17,7 +19,7 @@ trackDeployment() {
             operationTarget="$( echo "$line" | cut -f 5 )"
             operationHash="$( echo "$operationId|$operationState" | md5sum | cut -d ' ' -f 1 )"
 
-            if [[ "${TrackedOperationHashes[@]}" != *"$operationHash"* ]]; then
+            if [[ ! " ${TrackedOperationHashes[@]} " =~ " $operationHash " ]]; then
 
                 echo -e "\n$operationTimestamp\t$operationId - $operationType ($operationState)"
                 
