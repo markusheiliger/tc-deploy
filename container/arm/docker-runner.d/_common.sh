@@ -1,11 +1,12 @@
 #!/bin/bash
 set -e
 
-declare -g -x TrackedOperationHashes=()
-
 trackDeployment() { 
 
-    echo -e "\nTracked operations: ${#TrackedOperationHashes[@]}"
+    if [ test -f "/tmp/TrackedOperationHashes" ]; then
+        mapfile -t TrackedOperationHashes < /tmp/TrackedOperationHashes
+        echo -e "\nImported ${#TrackedOperationHashes[@]} tracked operations"
+    fi
 
     trace="$( echo "$1" | jq --raw-output '.[] | [.operationId, .properties.timestamp, .properties.provisioningOperation, .properties.provisioningState, .properties.targetResource.id // ""] | @tsv' )"
     
@@ -33,4 +34,5 @@ trackDeployment() {
         fi
     done
 
+    printf "%s\n" "${TrackedOperationHashes[@]}" > /tmp/TrackedOperationHashes
 }
