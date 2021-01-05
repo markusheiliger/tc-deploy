@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-declare -g TrackedOperationHashes=()
+declare -g -x TrackedOperationHashes=()
 
 trackDeployment() { 
 
