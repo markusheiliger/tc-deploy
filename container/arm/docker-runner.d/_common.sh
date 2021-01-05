@@ -15,7 +15,7 @@ trackDeployment() {
             operationTarget="$( echo "$line" | cut -f 5 )"
             operationHash="$( echo "$operationId|$operationState" | md5sum | cut -d ' ' -f 1 )"
 
-            if [[ ! grep -q "$operationHash" "/tmp/hashes" ]]; then
+            if ! grep -q "$operationHash" /tmp/hashes ; then
 
                 echo -e "\n$operationTimestamp\t$operationId - $operationType ($operationState)"
                 
@@ -23,7 +23,7 @@ trackDeployment() {
                     echo -e "\t\t\t$operationTarget"
                 fi
 
-                echo "$operationHash" >> "/tmp/hashes"
+                echo "$operationHash" >> /tmp/hashes
 
             fi
         fi
