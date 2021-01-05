@@ -3,11 +3,6 @@ set -e
 
 trackDeployment() { 
 
-    if [ test -f "/tmp/TrackedOperationHashes" ]; then
-        mapfile -t TrackedOperationHashes < /tmp/TrackedOperationHashes
-        echo -e "\nImported ${#TrackedOperationHashes[@]} tracked operations"
-    fi
-
     trace="$( echo "$1" | jq --raw-output '.[] | [.operationId, .properties.timestamp, .properties.provisioningOperation, .properties.provisioningState, .properties.targetResource.id // ""] | @tsv' )"
     
     echo "$trace" | while read -r line; do 
@@ -20,7 +15,7 @@ trackDeployment() {
             operationTarget="$( echo "$line" | cut -f 5 )"
             operationHash="$( echo "$operationId|$operationState" | md5sum | cut -d ' ' -f 1 )"
 
-            if [[ ! " ${TrackedOperationHashes[@]} " =~ " $operationHash " ]]; then
+            if [[ ! grep -q "$operationHash" "/tmp/hashes" ]]; then
 
                 echo -e "\n$operationTimestamp\t$operationId - $operationType ($operationState)"
                 
@@ -28,11 +23,9 @@ trackDeployment() {
                     echo -e "\t\t\t$operationTarget"
                 fi
 
-                TrackedOperationHashes+=("$operationHash")
+                echo "$operationHash" >> "/tmp/hashes"
 
             fi
         fi
     done
-
-    printf "%s\n" "${TrackedOperationHashes[@]}" > /tmp/TrackedOperationHashes
 }
