@@ -18,6 +18,12 @@ error() {
     echo "Error: $@" 1>&2
 }
 
+readonly LOG_FILE="/mnt/storage/$DeploymentId.log"
+
+touch $LOG_FILE     # ensure the log file exists
+exec 1>$LOG_FILE    # forward stdout to log file
+exec 2>&1           # redirect stderr to stdout
+
 if [[ ! -z "$DeploymentHost" ]]; then
     sed -i "s/server_name.*/server_name $DeploymentHost;/g" /etc/nginx/conf.d/default.conf
     nginx # start nginx and acquire SSL certificate from lets encrypt for our hostname
