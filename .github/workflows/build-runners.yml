@@ -38,8 +38,8 @@ jobs:
     needs: core
     runs-on: ubuntu-latest
     strategy:
+      max-parallel: 5
       matrix:
-        max-parallel: 5
         runner: ['arm', 'terraform']
 
     steps:
