@@ -26,8 +26,9 @@ exec 2>&1           # redirect stderr to stdout
 
 if [[ ! -z "$DeploymentHost" ]]; then
 
+    trace "Starting provider host"
     sed -i "s/server_name.*/server_name $DeploymentHost;/g" /etc/nginx/conf.d/default.conf
-    nginx # start nginx and acquire SSL certificate from lets encrypt for our hostname
+    nginx -q -s reload # start nginx and acquire SSL certificate from lets encrypt 
 
     while true; do
         # there is a chance that nginx isn't ready to respond to the ssl challenge - so retry if this operation fails
