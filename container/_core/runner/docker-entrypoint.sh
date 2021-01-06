@@ -30,7 +30,7 @@ if [[ ! -z "$DeploymentHost" ]]; then
     nginx # start nginx and acquire SSL certificate from lets encrypt for our hostname
 
     while true; do
-        # there is a chance that nginx isn't ready to respond the ssl challenge - so retry if this operation fails
+        # there is a chance that nginx isn't ready to respond to the ssl challenge - so retry if this operation fails
         certbot --nginx --register-unsafely-without-email --agree-tos --quiet -n -d $DeploymentHost && break || sleep 1
     done
 fi
