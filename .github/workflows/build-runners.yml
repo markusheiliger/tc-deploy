@@ -40,7 +40,7 @@ jobs:
     strategy:
       max-parallel: 5
       matrix:
-        runner: ['arm', 'terraform']
+        runner: ['arm', 'terraform', 'act']
 
     steps:
       - name: Checkout
