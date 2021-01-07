@@ -5,6 +5,9 @@ trace() {
     echo ">>> $@ ..."
 }
 
-act $DeploymentType --workflows $DIR
+readonly EVENT_FILE="$DIR/$DeploymentId.event"
 
-tail -f /dev/null
+echo "" | jq '{ "action": "workflow_dispatch", "input": . }' > $EVENT_FILE
+act --job create --eventpath $EVENT_FILE --workflows $DIR
+
+# tail -f /dev/null
