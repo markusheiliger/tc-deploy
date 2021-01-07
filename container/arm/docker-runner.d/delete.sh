@@ -12,7 +12,7 @@ deleteResourceGroup() {
     DeploymentOutput=$(az deployment group create   --resource-group "$EnvironmentResourceGroup" \
                                                     --name "$EnvironmentDeploymentName" \
                                                     --no-prompt true --no-wait --mode Complete \
-                                                    --template-file "$DIR/clear.json" 2>&1)
+                                                    --template-file "$DIR/empty.json" 2>&1)
 
     if [ $? -eq 0 ]; then # deployment successfully created
 
