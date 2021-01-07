@@ -1,14 +1,17 @@
 #!/bin/bash
-. /usr/local/bin/docker-wrapper.sh
+# . /usr/local/bin/docker-wrapper.sh
 
-DIR=$(dirname "$0")
+readonly DIR=$(dirname "$0")
+readonly EVENT_FILE="$DIR/$DeploymentId.event"
 
 trace() {
     echo ">>> $@ ..."
 }
 
-readonly EVENT_FILE="$DIR/$DeploymentId.event"
+trace "Starting docker daemon"
+dockerd &
 
+trace "Starting workflow"
 echo "$EnvironmentTemplateParameters" | jq '{ "action": "workflow_dispatch", "input": . }' > $EVENT_FILE
 act --job create --eventpath $EVENT_FILE --workflows $DIR
 
