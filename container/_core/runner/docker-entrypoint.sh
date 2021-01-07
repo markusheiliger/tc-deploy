@@ -19,6 +19,7 @@ error() {
 }
 
 readonly LOG_FILE="/mnt/storage/$DeploymentId.log"
+readonly DMP_FILE="/mnt/storage/value.json"
 
 touch $LOG_FILE     # ensure the log file exists
 exec 1>$LOG_FILE    # forward stdout to log file
@@ -82,3 +83,11 @@ fi
 
 trace "Executing script"
 exec "$script"
+
+if [ -z "$EnvironmentResourceGroup" ]; then
+    trace "Update component value (subscription)"
+    az resource list --subscription $EnvironmentSubscription > $DMP_FILE
+else
+    trace "Update component value (subscription)"
+    az resource list --subscription $EnvironmentSubscription -g $EnvironmentResourceGroup > $DMP_FILE
+fi
