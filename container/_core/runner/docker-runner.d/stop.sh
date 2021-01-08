@@ -17,6 +17,6 @@ fi
 if [[ ! -z "$VMResourceIds" ]]; then
 
     trace "Stopping & deallocating VM resources"
-    az vm deallocate --ids {vms_ids}
+    az vm deallocate --ids ${VMResourceIds}
 
 fi

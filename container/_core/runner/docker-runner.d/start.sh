@@ -17,6 +17,6 @@ fi
 if [[ ! -z "$VMResourceIds" ]]; then
 
     trace "Starting VM resources"
-    az vm start --ids {vms_ids}
+    az vm start --ids ${VMResourceIds}
 
 fi
