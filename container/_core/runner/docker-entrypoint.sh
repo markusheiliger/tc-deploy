@@ -82,7 +82,7 @@ if [[ -z "$@" ]]; then
 fi
 
 trace "Executing script"
-exec "$script"
+( exec "$script" )
 
 if [ -z "$EnvironmentResourceGroup" ]; then
     trace "Update component value (subscription)"

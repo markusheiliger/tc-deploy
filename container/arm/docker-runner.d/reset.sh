@@ -1,4 +1,4 @@
 #!/bin/bash
 
 DIR=$(dirname "$0")
-exec $DIR/create.sh
+( exec $DIR/create.sh )
