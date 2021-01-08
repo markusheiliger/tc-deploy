@@ -51,7 +51,8 @@ if [[ ! -z "$EnvironmentSubscription" ]]; then
 
     trace "Connecting Azure"
     while true; do
-        # managed identity isn't available directly - retry after a short nap
+        # managed identity isn't available directly 
+        # we need to do retry after a short nap
         az login --identity --only-show-errors && {
             export ARM_USE_MSI=true
             export ARM_MSI_ENDPOINT='http://169.254.169.254/metadata/identity/oauth2/token'
@@ -66,19 +67,30 @@ if [[ ! -z "$EnvironmentSubscription" ]]; then
 
 fi
 
-script="$@" # we start with the script provided by docker CMD
+# the script to execute is defined by the following options - the first option
+# matching an executable script file wins. 
+#
+# Option 1: a script path is provided as docker CMD command
+# Option 2: a script file following the pattern [TaskType].sh exists in the 
+#           current working directory (component definition directory)
+# Option 3: a script file following the pattern [TaskType].sh exists in the 
+#           /docker-runner.d directory (docker task script directory)
 
-if [[ -z "$@" ]]; then
+script="$@" 
 
-    # if no script was provided via command arguments we need to fallback 
-    # to the deployment type based runner script located in /docker-runner.d
-    script="$(find /docker-runner.d -maxdepth 1 -iname "$DeploymentType.sh")"
-
+if [[ -z "$script" ]]; then
+    script="$(find $PWD -maxdepth 1 -iname "$DeploymentType.sh")"
     if [[ -z "$script" ]]; then 
-        # there is no scipt availabe to handle our deployment type
+        script="$(find /docker-runner.d -maxdepth 1 -iname "$DeploymentType.sh")"
+    fi
+    if [[ -z "$script" ]]; then 
         error "Deployment type $DeploymentType is not supported." && exit 1
     fi
-    
+fi
+
+if [[ ! -x "$script" ]]; then
+    # ensure the script is executable
+    chmod +x $script 2>/dev/null
 fi
 
 trace "Executing script"
