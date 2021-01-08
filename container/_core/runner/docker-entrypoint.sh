@@ -88,6 +88,6 @@ if [ -z "$EnvironmentResourceGroup" ]; then
     trace "Update component value (subscription)"
     az resource list --subscription $EnvironmentSubscription > $DMP_FILE
 else
-    trace "Update component value (subscription)"
+    trace "Update component value (resource group)"
     az resource list --subscription $EnvironmentSubscription -g $EnvironmentResourceGroup > $DMP_FILE
 fi
