@@ -2,33 +2,32 @@
 DIR=$(dirname "$0")
 . $DIR/_common.sh
 
-EnvironmentDeploymentName="$(uuidgen)"
-EnvironmentTemplateFile="$(echo "$EnvironmentTemplateFolder/azuredeploy.json" | sed 's/^file:\/\///g')"
-EnvironmentTemplateUrl="$(echo "$EnvironmentTemplateBaseUrl/azuredeploy.json" | sed 's/^http:/https:/g')"
-EnvironmentTemplateParametersJson=$(echo "$EnvironmentTemplateParameters" | jq --compact-output '{ "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#", "contentVersion": "1.0.0.0", "parameters": (to_entries | if length == 0 then {} else (map( { (.key): { "value": .value } } ) | add) end) }' )
-EnvironmentTemplateParametersOpts=()
+ComponentDeploymentName="$(uuidgen)"
+ComponentDeploymentOutput=""
+ComponentTemplateFile="$(echo "$ComponentTemplateFolder/azuredeploy.json" | sed 's/^file:\/\///g')"
+ComponentTemplateUrl="$(echo "$ComponentTemplateBaseUrl/azuredeploy.json" | sed 's/^http:/https:/g')"
+ComponentTemplateParametersJson=$(echo "$ComponentTemplateParameters" | jq --compact-output '{ "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#", "contentVersion": "1.0.0.0", "parameters": (to_entries | if length == 0 then {} else (map( { (.key): { "value": .value } } ) | add) end) }' )
+ComponentTemplateParametersOpts=()
 
-$(cat "$EnvironmentTemplateFile" | jq --raw-output '.parameters | to_entries[] | select( .key | startswith("_artifactsLocation")) | .key' ) | while read p; do
+$(cat "$ComponentTemplateFile" | jq --raw-output '.parameters | to_entries[] | select( .key | startswith("_artifactsLocation")) | .key' ) | while read p; do
     case "$p" in
         _artifactsLocation)
-            EnvironmentTemplateParametersOpts+=( --parameters _artifactsLocation="$(dirname EnvironmentTemplateUrl)" )
+            ComponentTemplateParametersOpts+=( --parameters _artifactsLocation="$(dirname ComponentTemplateUrl)" )
             ;;
         _artifactsLocationSasToken)
-            EnvironmentTemplateParametersOpts+=( --parameters _artifactsLocationSasToken="?code=$EnvironmentTemplateUrlToken" )
+            ComponentTemplateParametersOpts+=( --parameters _artifactsLocationSasToken="?code=$ComponentTemplateUrlToken" )
             ;;
     esac
 done
 
-DeploymentOutput=""
+if [ -z "$ComponentResourceGroup" ]; then
 
-if [ -z "$EnvironmentResourceGroup" ]; then
-
-    DeploymentOutput=$(az deployment sub create --location "$EnvironmentLocation" \
-                                                --name "$EnvironmentDeploymentName" \
+    ComponentDeploymentOutput=$(az deployment sub create --location "$ComponentLocation" \
+                                                --name "$ComponentDeploymentName" \
                                                 --no-prompt true --no-wait \
-                                                --template-uri "$EnvironmentTemplateUrl" \
-                                                --parameters "$EnvironmentTemplateParametersJson" \
-                                                "${EnvironmentTemplateParametersOpts[@]}" 2>&1)
+                                                --template-uri "$ComponentTemplateUrl" \
+                                                --parameters "$ComponentTemplateParametersJson" \
+                                                "${ComponentTemplateParametersOpts[@]}" 2>&1)
 
     if [ $? -eq 0 ]; then # deployment successfully created
 
@@ -36,14 +35,14 @@ if [ -z "$EnvironmentResourceGroup" ]; then
 
             sleep 1
 
-            ProvisioningState=$(az deployment sub show --name "$EnvironmentDeploymentName" --query "properties.provisioningState" -o tsv)
-            ProvisioningDetails=$(az deployment operation sub list --name "$EnvironmentDeploymentName")
+            ProvisioningState=$(az deployment sub show --name "$ComponentDeploymentName" --query "properties.provisioningState" -o tsv)
+            ProvisioningDetails=$(az deployment operation sub list --name "$ComponentDeploymentName")
 
             trackDeployment "$ProvisioningDetails"
             
             if [[ "CANCELED|FAILED|SUCCEEDED" == *"${ProvisioningState^^}"* ]]; then
 
-                echo -e "\nDeployment $EnvironmentDeploymentName: $ProvisioningState"
+                echo -e "\nDeployment $ComponentDeploymentName: $ProvisioningState"
 
                 if [[ "CANCELED|FAILED" == *"${ProvisioningState^^}"* ]]; then
                     exit 1
@@ -57,11 +56,11 @@ if [ -z "$EnvironmentResourceGroup" ]; then
 
 else
 
-    DeploymentOutput=$(az deployment group create   --resource-group "$EnvironmentResourceGroup" \
-                                                    --name "$EnvironmentDeploymentName" \
+    ComponentDeploymentOutput=$(az deployment group create   --resource-group "$ComponentResourceGroup" \
+                                                    --name "$ComponentDeploymentName" \
                                                     --no-prompt true --no-wait --mode Complete \
-                                                    --template-uri "$EnvironmentTemplateUrl" \
-                                                    --parameters "$EnvironmentTemplateParametersJson" 2>&1)
+                                                    --template-uri "$ComponentTemplateUrl" \
+                                                    --parameters "$ComponentTemplateParametersJson" 2>&1)
 
     if [ $? -eq 0 ]; then # deployment successfully created
 
@@ -69,14 +68,14 @@ else
 
             sleep 1
 
-            ProvisioningState=$(az deployment group show --resource-group "$EnvironmentResourceGroup" --name "$EnvironmentDeploymentName" --query "properties.provisioningState" -o tsv)
-            ProvisioningDetails=$(az deployment operation group list --resource-group "$EnvironmentResourceGroup" --name "$EnvironmentDeploymentName")
+            ProvisioningState=$(az deployment group show --resource-group "$ComponentResourceGroup" --name "$ComponentDeploymentName" --query "properties.provisioningState" -o tsv)
+            ProvisioningDetails=$(az deployment operation group list --resource-group "$ComponentResourceGroup" --name "$ComponentDeploymentName")
 
             trackDeployment "$ProvisioningDetails"
             
             if [[ "CANCELED|FAILED|SUCCEEDED" == *"${ProvisioningState^^}"* ]]; then
 
-                echo -e "\nDeployment $EnvironmentDeploymentName: $ProvisioningState"
+                echo -e "\nDeployment $ComponentDeploymentName: $ProvisioningState"
 
                 if [[ "CANCELED|FAILED" == *"${ProvisioningState^^}"* ]]; then
                     exit 1
@@ -89,15 +88,15 @@ else
     fi
 fi
 
-if [ ! -z "$DeploymentOutput" ]; then
+if [ ! -z "$ComponentDeploymentOutput" ]; then
 
-    if [ $(echo "$DeploymentOutput" | jq empty > /dev/null 2>&1; echo $?) -eq 0 ]; then
+    if [ $(echo "$ComponentDeploymentOutput" | jq empty > /dev/null 2>&1; echo $?) -eq 0 ]; then
 
-        DeploymentOutput="$( echo $DeploymentOutput | jq --raw-output '.[] | .details[] | "Error: \(.message)\n"' | sed 's/\\n/\n/g'  )"
+        ComponentDeploymentOutput="$( echo $ComponentDeploymentOutput | jq --raw-output '.[] | .details[] | "Error: \(.message)\n"' | sed 's/\\n/\n/g'  )"
 
     fi
 
-    echo "$DeploymentOutput" && exit 1 # our script failed to enqueue a new deployment - we return a none zero exit code to inidicate this
+    echo "$ComponentDeploymentOutput" && exit 1 # our script failed to enqueue a new deployment - we return a none zero exit code to inidicate this
 
 fi
 

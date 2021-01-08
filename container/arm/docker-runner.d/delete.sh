@@ -5,11 +5,11 @@ DIR=$(dirname "$0")
 deleteResourceGroup() {
 
     EnvironmentDeploymentName="$(uuidgen)"
-    EnvironmentResourceGroup="$1" 
+    ComponentResourceGroup="$1" 
     
-    echo -e "Deleting resource group: $EnvironmentResourceGroup"
+    echo -e "Deleting resource group: $ComponentResourceGroup"
 
-    DeploymentOutput=$(az deployment group create   --resource-group "$EnvironmentResourceGroup" \
+    DeploymentOutput=$(az deployment group create   --resource-group "$ComponentResourceGroup" \
                                                     --name "$EnvironmentDeploymentName" \
                                                     --no-prompt true --no-wait --mode Complete \
                                                     --template-file "$DIR/empty.json" 2>&1)
@@ -20,8 +20,8 @@ deleteResourceGroup() {
 
             sleep 1
 
-            ProvisioningState=$(az deployment group show --resource-group "$EnvironmentResourceGroup" --name "$EnvironmentDeploymentName" --query "properties.provisioningState" -o tsv)
-            ProvisioningDetails=$(az deployment operation group list --resource-group "$EnvironmentResourceGroup" --name "$EnvironmentDeploymentName")
+            ProvisioningState=$(az deployment group show --resource-group "$ComponentResourceGroup" --name "$EnvironmentDeploymentName" --query "properties.provisioningState" -o tsv)
+            ProvisioningDetails=$(az deployment operation group list --resource-group "$ComponentResourceGroup" --name "$EnvironmentDeploymentName")
 
             trackDeployment "$ProvisioningDetails"
             
@@ -47,7 +47,7 @@ deleteResourceGroup() {
     fi
 }
 
-if [ -z "$EnvironmentResourceGroup" ]; then
+if [ -z "$ComponentResourceGroup" ]; then
 
     $(az group list --query "[].name" -o tsv) | while read rg; do
         deleteResourceGroup "$rg"
@@ -55,6 +55,6 @@ if [ -z "$EnvironmentResourceGroup" ]; then
 
 else
 
-    deleteResourceGroup "$EnvironmentResourceGroup"
+    deleteResourceGroup "$ComponentResourceGroup"
 
 fi
