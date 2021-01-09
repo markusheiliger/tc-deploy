@@ -88,7 +88,7 @@ if [[ -z "$script" ]]; then
     fi
 fi
 
-trace "Executing script"
+trace "Executing script ($script)"
 if [[ -f "$script" && -x "$script" ]]; then
     ( exec "$script" )
 elif [[ -f "$script" ]]; then
