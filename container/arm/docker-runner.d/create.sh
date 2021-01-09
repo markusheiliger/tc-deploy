@@ -94,7 +94,7 @@ else
     fi
 fi
 
-echo "#4"
+echo "#4 => '$ComponentDeploymentOutput'"
 
 if [ ! -z "$ComponentDeploymentOutput" ]; then
 
