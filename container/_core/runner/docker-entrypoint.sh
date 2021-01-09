@@ -88,9 +88,13 @@ if [[ -z "$script" ]]; then
     fi
 fi
 
-if [[ ! -x "$script" ]]; then
-    # ensure the script is executable
-    chmod +x $script 2>/dev/null
+trace "Executing script"
+if [[ -f "$script" && -x "$script" ]]; then
+    ( exec "$script" )
+elif [[ -f "$script" ]]; then
+    error "Script '$script' is not marked as executable" && exit 1
+else
+    error "Script '$script' does not exist" && exit 1
 fi
 
 trace "Executing script ($script)"
