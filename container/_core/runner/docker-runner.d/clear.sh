@@ -1,4 +1,7 @@
 #!/bin/bash
 
 DIR=$(dirname "$0")
-( exec $DIR/delete.sh )
+SCR="$DIR/delete.sh"
+
+echo -e "\nUsing $SCR"
+. $SCR

@@ -1,4 +1,7 @@
 #!/bin/bash
 
 DIR=$(dirname "$0")
-( exec $DIR/create.sh )
+SCR="$DIR/create.sh"
+
+echo -e "\nUsing $SCR"
+. $SCR
