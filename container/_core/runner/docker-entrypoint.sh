@@ -93,7 +93,7 @@ if [[ ! -x "$script" ]]; then
     chmod +x $script 2>/dev/null
 fi
 
-trace "Executing script"
+trace "Executing script ($script)"
 ( exec "$script" )
 
 if [ -z "$ComponentResourceGroup" ]; then
