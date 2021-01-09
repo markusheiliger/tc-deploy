@@ -2,12 +2,16 @@
 DIR=$(dirname "$0")
 . $DIR/_common.sh
 
+echo "#1"
+
 ComponentDeploymentName="$(uuidgen)"
 ComponentDeploymentOutput=""
 ComponentTemplateFile="$(echo "$ComponentTemplateFolder/azuredeploy.json" | sed 's/^file:\/\///g')"
 ComponentTemplateUrl="$(echo "$ComponentTemplateBaseUrl/azuredeploy.json" | sed 's/^http:/https:/g')"
 ComponentTemplateParametersJson=$(echo "$ComponentTemplateParameters" | jq --compact-output '{ "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#", "contentVersion": "1.0.0.0", "parameters": (to_entries | if length == 0 then {} else (map( { (.key): { "value": .value } } ) | add) end) }' )
 ComponentTemplateParametersOpts=()
+
+echo "#2"
 
 $(cat "$ComponentTemplateFile" | jq --raw-output '.parameters | to_entries[] | select( .key | startswith("_artifactsLocation")) | .key' ) | while read p; do
     case "$p" in
@@ -19,6 +23,8 @@ $(cat "$ComponentTemplateFile" | jq --raw-output '.parameters | to_entries[] | s
             ;;
     esac
 done
+
+echo "#3"
 
 if [ -z "$ComponentResourceGroup" ]; then
 
@@ -87,6 +93,8 @@ else
         done
     fi
 fi
+
+echo "#4"
 
 if [ ! -z "$ComponentDeploymentOutput" ]; then
 
