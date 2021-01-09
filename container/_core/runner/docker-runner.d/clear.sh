@@ -3,5 +3,5 @@
 DIR=$(dirname "$0")
 SCR="$DIR/delete.sh"
 
-echo -e "\nUsing $SCR"
+echo "Using $SCR"
 . $SCR

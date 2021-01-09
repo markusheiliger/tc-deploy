@@ -12,7 +12,7 @@ ComponentTemplateParametersOpts=()
 $(cat "$ComponentTemplateFile" | jq --raw-output '.parameters | to_entries[] | select( .key | startswith("_artifactsLocation")) | .key' ) | while read p; do
     case "$p" in
         _artifactsLocation)
-            ComponentTemplateParametersOpts+=( --parameters _artifactsLocation="$(dirname ComponentTemplateUrl)" )
+            ComponentTemplateParametersOpts+=( --parameters _artifactsLocation="$(dirname $ComponentTemplateUrl)" )
             ;;
         _artifactsLocationSasToken)
             ComponentTemplateParametersOpts+=( --parameters _artifactsLocationSasToken="?code=$ComponentTemplateUrlToken" )
