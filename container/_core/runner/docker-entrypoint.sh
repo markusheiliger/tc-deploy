@@ -88,17 +88,14 @@ if [[ -z "$script" ]]; then
     fi
 fi
 
-trace "Executing script ($script)"
 if [[ -f "$script" && -x "$script" ]]; then
-    ( exec "$script" )
+    # lets process task - isolate task script execution in sub shell 
+    trace "Executing script"; ( exec "$script"; exit $? ) || exit $?
 elif [[ -f "$script" ]]; then
     error "Script '$script' is not marked as executable" && exit 1
 else
     error "Script '$script' does not exist" && exit 1
 fi
-
-trace "Executing script"
-( exec "$script"; exit $? ) || exit $?
 
 if [ -z "$ComponentResourceGroup" ]; then
     trace "Update component value (subscription)"
