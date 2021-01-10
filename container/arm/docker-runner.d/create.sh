@@ -97,14 +97,9 @@ fi
 echo "#4 => '$ComponentDeploymentOutput'"
 
 if [ ! -z "$ComponentDeploymentOutput" ]; then
-
     if [ $(echo "$ComponentDeploymentOutput" | jq empty > /dev/null 2>&1; echo $?) -eq 0 ]; then
-
-        ComponentDeploymentOutput="$( echo $ComponentDeploymentOutput | jq --raw-output '.[] | .details[] | "Error: \(.message)\n"' | sed 's/\\n/\n/g'  )"
-
+        ComponentDeploymentOutput="$( echo $ComponentDeploymentOutput | jq --raw-output '.. | .message? | select(. != null) | "Error: \(.)\n"' | sed 's/\\n/\n/g'  )"
     fi
-
     echo "$ComponentDeploymentOutput" && exit 1 # our script failed to enqueue a new deployment - we return a none zero exit code to inidicate this
-
 fi
 
