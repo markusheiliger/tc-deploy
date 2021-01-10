@@ -97,7 +97,7 @@ else
     error "Script '$script' does not exist" && exit 1
 fi
 
-trace "Executing script ($script)"
+trace "Executing script"
 ( exec "$script" )
 
 if [ -z "$ComponentResourceGroup" ]; then

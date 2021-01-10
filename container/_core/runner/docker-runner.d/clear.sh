@@ -1,4 +1,4 @@
 #!/bin/bash
 
 DIR=$(dirname "$0")
-( exec $DIR/delete.sh )
+( exec "$DIR/delete.sh" )
