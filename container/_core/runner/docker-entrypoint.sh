@@ -1,13 +1,13 @@
 #!/bin/bash
 
-set -e
+set -e # exit on error
 trap 'catch $? $LINENO' EXIT
 
 catch() {
-  if [ "$1" != "0" ]; then
-    # error handling goes here
-    echo "Error $1 occurred on $2"
-  fi
+    if [ "$1" != "0" ]; then
+        # we trapped an error - write some reporting output
+        error "Exit code $1 was returned from line #$2 !!!"
+    fi
 }
 
 trace() {
@@ -98,7 +98,7 @@ else
 fi
 
 trace "Executing script"
-( exec "$script" )
+( exec "$script"; exit $? ) || exit $?
 
 if [ -z "$ComponentResourceGroup" ]; then
     trace "Update component value (subscription)"
