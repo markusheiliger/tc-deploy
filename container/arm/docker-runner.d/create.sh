@@ -22,7 +22,8 @@ done
 
 if [ -z "$ComponentResourceGroup" ]; then
 
-    ComponentDeploymentOutput=$(az deployment sub create --location "$ComponentLocation" \
+    ComponentDeploymentOutput=$(az deployment sub create --subscription $ComponentSubscription \
+                                                --location "$ComponentLocation" \
                                                 --name "$ComponentDeploymentName" \
                                                 --no-prompt true --no-wait \
                                                 --template-uri "$ComponentTemplateUrl" \
@@ -56,7 +57,8 @@ if [ -z "$ComponentResourceGroup" ]; then
 
 else
 
-    ComponentDeploymentOutput=$(az deployment group create   --resource-group "$ComponentResourceGroup" \
+    ComponentDeploymentOutput=$(az deployment group create --subscription $ComponentSubscription \
+                                                    --resource-group "$ComponentResourceGroup" \
                                                     --name "$ComponentDeploymentName" \
                                                     --no-prompt true --no-wait --mode Complete \
                                                     --template-uri "$ComponentTemplateUrl" \
