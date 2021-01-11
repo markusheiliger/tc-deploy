@@ -90,7 +90,7 @@ fi
 
 if [[ -f "$script" && -x "$script" ]]; then
     # lets process task - isolate task script execution in sub shell 
-    trace "Executing script"; ( exec "$script"; exit $? ) || exit $?
+    trace "Executing script ($script)"; ( exec "$script"; exit $? ) || exit $?
 elif [[ -f "$script" ]]; then
     error "Script '$script' is not marked as executable" && exit 1
 else
