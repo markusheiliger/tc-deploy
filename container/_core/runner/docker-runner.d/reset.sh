@@ -1,6 +1,15 @@
 #!/bin/bash
 
 DIR=$(dirname "$0")
+TSK="create.sh"
+
+# check if the task file exists in the current dir
+SCRIPT="$(find $DIR -maxdepth 1 -iname "$TSK")"
+
+if [[ -z "$SCRIPT" ]]; then 
+    # check if the task file exists in the default runner dir
+    SCRIPT="$(find /docker-runner.d -maxdepth 1 -iname "$TSK")"
+fi
 
 # isolate task script execution in sub shell  
-( exec "$DIR/create.sh"; exit $? ) || exit $?
+( exec "$SCRIPT"; exit $? ) || exit $?
