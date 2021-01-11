@@ -3,8 +3,8 @@
 DIR=$(dirname "$0")
 TSK="create.sh"
 
-# check if the task file exists in the current dir
-SCRIPT="$(find $DIR -maxdepth 1 -iname "$TSK")"
+# check if the task file exists in the process dir
+SCRIPT="$(find $PWD -maxdepth 1 -iname "$TSK")"
 
 if [[ -z "$SCRIPT" ]]; then 
     # check if the task file exists in the default runner dir
