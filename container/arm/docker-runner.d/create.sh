@@ -65,7 +65,7 @@ else
                                                     --name "$ComponentDeploymentName" \
                                                     --no-prompt true --no-wait --mode Complete \
                                                     --template-uri "$ComponentTemplateUrl" \
-                                                    --parameters "$ComponentTemplateParametersJson" 
+                                                    --parameters "$ComponentTemplateParametersJson" \
                                                     "${ComponentTemplateParametersOpts[@]}" 2>&1)
 
     if [ $? -eq 0 ]; then # deployment successfully created
