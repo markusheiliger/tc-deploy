@@ -2,6 +2,10 @@
 DIR=$(dirname "$0")
 . $DIR/_common.sh
 
+trace() {
+    echo -e "\n>>> $@ ...\n"
+}
+
 ComponentDeploymentName="$(uuidgen)"
 ComponentDeploymentOutput=""
 ComponentTemplateFile="$(echo "$ComponentTemplateFolder/azuredeploy.json" | sed 's/^file:\/\///g')"
@@ -19,10 +23,7 @@ while read p; do
     esac
 done < <( echo "$( cat "$ComponentTemplateFile" | jq --raw-output '.parameters | to_entries[] | select( .key | startswith("_artifactsLocation")) | .key' )" )
 
-echo "========================================"
-echo "Dynamic parameters: ${ComponentTemplateParametersOpts[@]}"
-echo "========================================"
-
+trace "Deploying ARM template"
 if [ -z "$ComponentResourceGroup" ]; then
 
     ComponentDeploymentOutput=$(az deployment sub create --subscription $ComponentSubscription \
