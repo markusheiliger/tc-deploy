@@ -7,18 +7,17 @@ ComponentDeploymentOutput=""
 ComponentTemplateFile="$(echo "$ComponentTemplateFolder/azuredeploy.json" | sed 's/^file:\/\///g')"
 ComponentTemplateUrl="$(echo "$ComponentTemplateBaseUrl/azuredeploy.json" | sed 's/^http:/https:/g')"
 ComponentTemplateParametersJson=$(echo "$ComponentTemplateParameters" | jq --compact-output '{ "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#", "contentVersion": "1.0.0.0", "parameters": (to_entries | if length == 0 then {} else (map( { (.key): { "value": .value } } ) | add) end) }' )
-ComponentTemplateParametersOpts=()
 
 echo "$(cat "$ComponentTemplateFile" | jq --raw-output '.parameters | to_entries[] | select( .key | startswith("_artifactsLocation")) | .key' )" | while read p; do
     echo "!!! $p"
     case "$p" in
         _artifactsLocation)
-            echo "+++ _artifactsLocation"
             ComponentTemplateParametersOpts+=( --parameters _artifactsLocation="$(dirname $ComponentTemplateUrl)" )
+            echo "+++ _artifactsLocation"
             ;;
         _artifactsLocationSasToken)
-            echo "+++ _artifactsLocationSasToken"
             ComponentTemplateParametersOpts+=( --parameters _artifactsLocationSasToken="?code=$ComponentTemplateUrlToken" )
+            echo "+++ _artifactsLocationSasToken"
             ;;
     esac
 done
@@ -69,7 +68,8 @@ else
                                                     --name "$ComponentDeploymentName" \
                                                     --no-prompt true --no-wait --mode Complete \
                                                     --template-uri "$ComponentTemplateUrl" \
-                                                    --parameters "$ComponentTemplateParametersJson" 2>&1)
+                                                    --parameters "$ComponentTemplateParametersJson" 
+                                                    "${ComponentTemplateParametersOpts[@]}" 2>&1)
 
     if [ $? -eq 0 ]; then # deployment successfully created
 
