@@ -12,7 +12,7 @@ ComponentTemplateParametersOpts=()
 echo "==============================="
 cat "$ComponentTemplateFile"
 echo "==============================="
-echo "$(cat "$ComponentTemplateFile" | jq --raw-output '.parameters | to_entries[] | select( .key | startswith("_artifactsLocation")) | .key' )"
+echo "$( cat "$ComponentTemplateFile" | jq --raw-output '.parameters | to_entries[] | select( .key | startswith("_artifactsLocation")) | .key' )"
 echo "==============================="
 
 echo "$(cat "$ComponentTemplateFile" | jq --raw-output '.parameters | to_entries[] | select( .key | startswith("_artifactsLocation")) | .key' )" | while read p; do
