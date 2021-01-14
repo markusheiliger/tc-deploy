@@ -20,7 +20,7 @@ while read p; do
 done < <( echo "$( cat "$ComponentTemplateFile" | jq --raw-output '.parameters | to_entries[] | select( .key | startswith("_artifactsLocation")) | .key' )" )
 
 echo "========================================"
-echo "Dynamic parameter count: ${#ComponentTemplateParametersOpts[@]}"
+echo "Dynamic parameters: ${ComponentTemplateParametersOpts[@]}"
 echo "========================================"
 
 if [ -z "$ComponentResourceGroup" ]; then
