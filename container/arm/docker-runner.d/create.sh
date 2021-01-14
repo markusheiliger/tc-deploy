@@ -9,22 +9,23 @@ ComponentTemplateUrl="$(echo "$ComponentTemplateBaseUrl/azuredeploy.json" | sed 
 ComponentTemplateParametersJson=$(echo "$ComponentTemplateParameters" | jq --compact-output '{ "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#", "contentVersion": "1.0.0.0", "parameters": (to_entries | if length == 0 then {} else (map( { (.key): { "value": .value } } ) | add) end) }' )
 ComponentTemplateParametersOpts=()
 
-echo "==============================="
-cat "$ComponentTemplateFile"
-echo "==============================="
-echo "$( cat "$ComponentTemplateFile" | jq --raw-output '.parameters | to_entries[] | select( .key | startswith("_artifactsLocation")) | .key' )"
-echo "==============================="
-
 echo "$(cat "$ComponentTemplateFile" | jq --raw-output '.parameters | to_entries[] | select( .key | startswith("_artifactsLocation")) | .key' )" | while read p; do
+    echo "!!! $p"
     case "$p" in
         _artifactsLocation)
+            echo "+++ _artifactsLocation"
             ComponentTemplateParametersOpts+=( --parameters _artifactsLocation="$(dirname $ComponentTemplateUrl)" )
             ;;
         _artifactsLocationSasToken)
+            echo "+++ _artifactsLocationSasToken"
             ComponentTemplateParametersOpts+=( --parameters _artifactsLocationSasToken="?code=$ComponentTemplateUrlToken" )
             ;;
     esac
 done
+
+echo "========================================"
+echo "${ComponentTemplateParametersOpts[@]}"
+echo "========================================"
 
 if [ -z "$ComponentResourceGroup" ]; then
 
