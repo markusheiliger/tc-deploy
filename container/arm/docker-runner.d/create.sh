@@ -8,7 +8,7 @@ ComponentTemplateFile="$(echo "$ComponentTemplateFolder/azuredeploy.json" | sed 
 ComponentTemplateUrl="$(echo "$ComponentTemplateBaseUrl/azuredeploy.json" | sed 's/^http:/https:/g')"
 ComponentTemplateParametersJson=$(echo "$ComponentTemplateParameters" | jq --compact-output '{ "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#", "contentVersion": "1.0.0.0", "parameters": (to_entries | if length == 0 then {} else (map( { (.key): { "value": .value } } ) | add) end) }' )
 
-echo "$(cat "$ComponentTemplateFile" | jq --raw-output '.parameters | to_entries[] | select( .key | startswith("_artifactsLocation")) | .key' )" | while read p; do
+while read p; do
     case "$p" in
         _artifactsLocation)
             ComponentTemplateParametersOpts+=( --parameters _artifactsLocation="$(dirname $ComponentTemplateUrl)" )
@@ -17,8 +17,7 @@ echo "$(cat "$ComponentTemplateFile" | jq --raw-output '.parameters | to_entries
             ComponentTemplateParametersOpts+=( --parameters _artifactsLocationSasToken="?code=$ComponentTemplateUrlToken" )
             ;;
     esac
-    echo "!!! ${#ComponentTemplateParametersOpts[@]}"
-done
+done <<< echo "$(cat "$ComponentTemplateFile" | jq --raw-output '.parameters | to_entries[] | select( .key | startswith("_artifactsLocation")) | .key' )"
 
 echo "========================================"
 echo "Dynamic parameter count: ${#ComponentTemplateParametersOpts[@]}"
