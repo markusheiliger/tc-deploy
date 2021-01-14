@@ -9,21 +9,18 @@ ComponentTemplateUrl="$(echo "$ComponentTemplateBaseUrl/azuredeploy.json" | sed 
 ComponentTemplateParametersJson=$(echo "$ComponentTemplateParameters" | jq --compact-output '{ "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#", "contentVersion": "1.0.0.0", "parameters": (to_entries | if length == 0 then {} else (map( { (.key): { "value": .value } } ) | add) end) }' )
 
 echo "$(cat "$ComponentTemplateFile" | jq --raw-output '.parameters | to_entries[] | select( .key | startswith("_artifactsLocation")) | .key' )" | while read p; do
-    echo "!!! $p"
     case "$p" in
         _artifactsLocation)
             ComponentTemplateParametersOpts+=( --parameters _artifactsLocation="$(dirname $ComponentTemplateUrl)" )
-            echo "+++ _artifactsLocation"
             ;;
         _artifactsLocationSasToken)
             ComponentTemplateParametersOpts+=( --parameters _artifactsLocationSasToken="?code=$ComponentTemplateUrlToken" )
-            echo "+++ _artifactsLocationSasToken"
             ;;
     esac
 done
 
 echo "========================================"
-echo "${ComponentTemplateParametersOpts[@]}"
+echo "Dynamic parameter count: ${#ComponentTemplateParametersOpts[@]}"
 echo "========================================"
 
 if [ -z "$ComponentResourceGroup" ]; then
