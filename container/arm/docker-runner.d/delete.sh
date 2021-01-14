@@ -4,8 +4,8 @@ DIR=$(dirname "$0")
 
 deleteResourceGroup() {
 
-    EnvironmentDeploymentName="$(uuidgen)"
-    ComponentResourceGroup="$1" 
+    local ComponentResourceGroup="$1" 
+    local EnvironmentDeploymentName="$(uuidgen)"
     
     echo -e "Deleting resource group: $ComponentResourceGroup"
 
