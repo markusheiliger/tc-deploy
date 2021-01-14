@@ -17,6 +17,7 @@ echo "$(cat "$ComponentTemplateFile" | jq --raw-output '.parameters | to_entries
             ComponentTemplateParametersOpts+=( --parameters _artifactsLocationSasToken="?code=$ComponentTemplateUrlToken" )
             ;;
     esac
+    echo "!!! ${#ComponentTemplateParametersOpts[@]}"
 done
 
 echo "========================================"
