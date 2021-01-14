@@ -35,6 +35,9 @@ if [[ ! -z "$TaskHost" ]]; then
         # there is a chance that nginx isn't ready to respond to the ssl challenge - so retry if this operation fails
         certbot --nginx --register-unsafely-without-email --agree-tos --quiet -n -d $TaskHost && break || sleep 1
     done
+
+    # list servernames the host is listening on
+    nginx -T 2>/dev/null | grep "server_name "
 fi
 
 find "/docker-entrypoint.d/" -follow -type f -iname "*.sh" -print | sort -n | while read -r f; do
