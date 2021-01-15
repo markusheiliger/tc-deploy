@@ -37,7 +37,7 @@ if [[ ! -z "$TaskHost" ]]; then
     done
 
     # list servernames the host is listening on
-    nginx -T 2>/dev/null | grep "server_name "
+    nginx -T 2>/dev/null | grep "server_name " | sort -u
 fi
 
 find "/docker-entrypoint.d/" -follow -type f -iname "*.sh" -print | sort -n | while read -r f; do
